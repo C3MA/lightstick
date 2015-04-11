@@ -591,15 +591,18 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <part name="JP2" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="P+4" library="supply1" deviceset="+3V3" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
+<part name="JP3" library="pinhead" deviceset="PINHD-1X3" device=""/>
+<part name="GND5" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
 <text x="10.16" y="43.18" size="1.778" layer="91">power supply</text>
 <text x="106.68" y="35.56" size="1.778" layer="91">to LED stripe</text>
-<text x="152.4" y="68.58" size="1.778" layer="91">programming switch</text>
-<text x="144.78" y="40.64" size="1.778" layer="91">for programming: connect GPIO0 to +3V3
+<text x="17.78" y="83.82" size="1.778" layer="91">programming switch</text>
+<text x="10.16" y="55.88" size="1.778" layer="91">for programming: connect GPIO0 to +3V3
 for normal operation: connect GPIO to GND</text>
+<text x="12.7" y="119.38" size="1.778" layer="91">UART</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
@@ -614,9 +617,11 @@ for normal operation: connect GPIO to GND</text>
 <instance part="JP1" gate="A" x="124.46" y="25.4"/>
 <instance part="P+3" gate="1" x="111.76" y="33.02"/>
 <instance part="GND3" gate="1" x="111.76" y="17.78"/>
-<instance part="JP2" gate="A" x="170.18" y="58.42"/>
-<instance part="P+4" gate="G$1" x="157.48" y="66.04"/>
-<instance part="GND4" gate="1" x="157.48" y="50.8"/>
+<instance part="JP2" gate="A" x="35.56" y="73.66"/>
+<instance part="P+4" gate="G$1" x="22.86" y="81.28"/>
+<instance part="GND4" gate="1" x="22.86" y="66.04"/>
+<instance part="JP3" gate="A" x="30.48" y="109.22"/>
+<instance part="GND5" gate="1" x="17.78" y="101.6"/>
 </instances>
 <busses>
 </busses>
@@ -643,8 +648,14 @@ for normal operation: connect GPIO to GND</text>
 <segment>
 <pinref part="JP2" gate="A" pin="3"/>
 <pinref part="GND4" gate="1" pin="GND"/>
-<wire x1="167.64" y1="55.88" x2="157.48" y2="55.88" width="0.1524" layer="91"/>
-<wire x1="157.48" y1="55.88" x2="157.48" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="71.12" x2="22.86" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="71.12" x2="22.86" y2="68.58" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="JP3" gate="A" pin="3"/>
+<pinref part="GND5" gate="1" pin="GND"/>
+<wire x1="27.94" y1="106.68" x2="17.78" y2="106.68" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="106.68" x2="17.78" y2="104.14" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="+12V" class="0">
@@ -671,22 +682,36 @@ for normal operation: connect GPIO to GND</text>
 <segment>
 <pinref part="JP2" gate="A" pin="1"/>
 <pinref part="P+4" gate="G$1" pin="+3V3"/>
-<wire x1="167.64" y1="60.96" x2="157.48" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="157.48" y1="60.96" x2="157.48" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="33.02" y1="76.2" x2="22.86" y2="76.2" width="0.1524" layer="91"/>
+<wire x1="22.86" y1="76.2" x2="22.86" y2="78.74" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="DATA/GPIO2" class="0">
 <segment>
 <pinref part="JP1" gate="A" pin="2"/>
 <wire x1="121.92" y1="25.4" x2="111.76" y2="25.4" width="0.1524" layer="91"/>
-<label x="111.76" y="25.4" size="1.778" layer="95" rot="R180" xref="yes"/>
+<label x="111.76" y="25.4" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="GPIO0" class="0">
 <segment>
 <pinref part="JP2" gate="A" pin="2"/>
-<wire x1="167.64" y1="58.42" x2="157.48" y2="58.42" width="0.1524" layer="91"/>
-<label x="157.48" y="58.42" size="1.778" layer="95" rot="R180" xref="yes"/>
+<wire x1="33.02" y1="73.66" x2="22.86" y2="73.66" width="0.1524" layer="91"/>
+<label x="22.86" y="73.66" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="RX" class="0">
+<segment>
+<pinref part="JP3" gate="A" pin="1"/>
+<wire x1="27.94" y1="111.76" x2="17.78" y2="111.76" width="0.1524" layer="91"/>
+<label x="17.78" y="111.76" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="TX" class="0">
+<segment>
+<pinref part="JP3" gate="A" pin="2"/>
+<wire x1="27.94" y1="109.22" x2="17.78" y2="109.22" width="0.1524" layer="91"/>
+<label x="17.78" y="109.22" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 </nets>
