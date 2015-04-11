@@ -616,6 +616,7 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <wire x1="7.15" y1="-12.4" x2="7.15" y2="12.4" width="0.127" layer="51"/>
 <wire x1="7.15" y1="12.4" x2="-7.15" y2="12.4" width="0.127" layer="51"/>
 <wire x1="-7.15" y1="12.4" x2="-7.15" y2="-12.4" width="0.127" layer="51"/>
+<text x="-3.81" y="0" size="1.27" layer="51" font="vector" ratio="10">ESP 8266</text>
 </package>
 <package name="TO-263">
 <smd name="GROUND" x="8.3185" y="0" dx="2.159" dy="1.0668" layer="1"/>
@@ -624,6 +625,25 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <smd name="OFF" x="8.3185" y="3.4036" dx="2.159" dy="1.0668" layer="1"/>
 <smd name="OUTPUT" x="8.3185" y="-1.7018" dx="2.159" dy="1.0668" layer="1"/>
 <smd name="VIN" x="8.3185" y="-3.4036" dx="2.159" dy="1.0668" layer="1"/>
+<wire x1="-5.08" y1="-5.207" x2="-3.81" y2="-5.207" width="0.127" layer="51"/>
+<wire x1="-3.81" y1="-5.207" x2="5.08" y2="-5.207" width="0.127" layer="51"/>
+<wire x1="-5.08" y1="-5.207" x2="-5.08" y2="5.207" width="0.127" layer="51"/>
+<wire x1="-5.08" y1="5.207" x2="-3.81" y2="5.207" width="0.127" layer="51"/>
+<wire x1="-3.81" y1="5.207" x2="5.08" y2="5.207" width="0.127" layer="51"/>
+<wire x1="5.08" y1="-5.207" x2="5.08" y2="-3.4036" width="0.127" layer="51"/>
+<wire x1="5.08" y1="-3.4036" x2="5.08" y2="-1.7018" width="0.127" layer="51"/>
+<wire x1="5.08" y1="-1.7018" x2="5.08" y2="0" width="0.127" layer="51"/>
+<wire x1="5.08" y1="0" x2="5.08" y2="1.7018" width="0.127" layer="51"/>
+<wire x1="5.08" y1="1.7018" x2="5.08" y2="3.4036" width="0.127" layer="51"/>
+<wire x1="5.08" y1="3.4036" x2="5.08" y2="5.207" width="0.127" layer="51"/>
+<wire x1="-3.81" y1="-5.207" x2="-3.81" y2="5.207" width="0.127" layer="51"/>
+<circle x="3.81" y="-3.81" radius="0.635" width="0.127" layer="51"/>
+<wire x1="5.08" y1="0" x2="8.89" y2="0" width="0.9652" layer="51"/>
+<wire x1="5.08" y1="1.7018" x2="8.89" y2="1.7018" width="0.9652" layer="51"/>
+<wire x1="5.08" y1="3.4036" x2="8.89" y2="3.4036" width="0.9652" layer="51"/>
+<wire x1="5.08" y1="-3.4036" x2="8.89" y2="-3.4036" width="0.9652" layer="51"/>
+<wire x1="5.08" y1="-1.7018" x2="8.89" y2="-1.7018" width="0.9652" layer="51"/>
+<text x="0" y="-3.81" size="1.27" layer="51" rot="R90">LM 2576</text>
 </package>
 </packages>
 <symbols>
@@ -651,6 +671,7 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <wire x1="-12.7" y1="-10.16" x2="12.7" y2="-10.16" width="0.254" layer="94"/>
 <wire x1="12.7" y1="-10.16" x2="12.7" y2="10.16" width="0.254" layer="94"/>
 <wire x1="12.7" y1="10.16" x2="-12.7" y2="10.16" width="0.254" layer="94"/>
+<text x="-5.08" y="2.54" size="1.778" layer="94">ESP 8266</text>
 </symbol>
 <symbol name="LM2576">
 <pin name="VIN" x="-20.32" y="0" length="middle" direction="pwr"/>
