@@ -602,6 +602,20 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <text x="-4.2418" y="2.413" size="2.0828" layer="25" ratio="10" rot="SR0">&gt;NAME</text>
 <text x="-5.6896" y="-4.4196" size="2.0828" layer="27" ratio="10" rot="SR0">&gt;VALUE</text>
 </package>
+<package name="ESP8266">
+<pad name="GND" x="-3.81" y="-7.62" drill="1.3" shape="square"/>
+<pad name="GPIO2" x="-1.27" y="-7.62" drill="1.3"/>
+<pad name="GPIO0" x="1.27" y="-7.62" drill="1.3"/>
+<pad name="URXD" x="3.81" y="-7.62" drill="1.3" shape="square"/>
+<pad name="VCC" x="3.81" y="-10.16" drill="1.3"/>
+<pad name="GPIO16" x="1.27" y="-10.16" drill="1.3"/>
+<pad name="CH_PD" x="-1.27" y="-10.16" drill="1.3"/>
+<pad name="UTXD" x="-3.81" y="-10.16" drill="1.3"/>
+<wire x1="-7.15" y1="-12.4" x2="7.15" y2="-12.4" width="0.127" layer="51"/>
+<wire x1="7.15" y1="-12.4" x2="7.15" y2="12.4" width="0.127" layer="51"/>
+<wire x1="7.15" y1="12.4" x2="-7.15" y2="12.4" width="0.127" layer="51"/>
+<wire x1="-7.15" y1="12.4" x2="-7.15" y2="-12.4" width="0.127" layer="51"/>
+</package>
 </packages>
 <symbols>
 <symbol name="MCP1703AT-3302E/CB">
@@ -614,6 +628,20 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <wire x1="12.7" y1="5.08" x2="-12.7" y2="5.08" width="0.1524" layer="94"/>
 <text x="-3.9116" y="7.5946" size="2.0828" layer="95" ratio="10" rot="SR0">&gt;NAME</text>
 <text x="-5.2324" y="-14.9352" size="2.0828" layer="96" ratio="10" rot="SR0">&gt;VALUE</text>
+</symbol>
+<symbol name="ESP8266">
+<pin name="VCC" x="-17.78" y="7.62" length="middle" direction="pwr"/>
+<pin name="RST" x="-17.78" y="2.54" length="middle" direction="in"/>
+<pin name="CH_PD" x="-17.78" y="-2.54" length="middle" direction="in"/>
+<pin name="GND" x="-17.78" y="-7.62" length="middle"/>
+<pin name="DATA/GPIO2" x="17.78" y="-7.62" length="middle" rot="R180"/>
+<pin name="GPIO0" x="17.78" y="-2.54" length="middle" rot="R180"/>
+<pin name="TX" x="17.78" y="2.54" length="middle" direction="out" rot="R180"/>
+<pin name="RX" x="17.78" y="7.62" length="middle" direction="in" rot="R180"/>
+<wire x1="-12.7" y1="10.16" x2="-12.7" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="-12.7" y1="-10.16" x2="12.7" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="12.7" y1="-10.16" x2="12.7" y2="10.16" width="0.254" layer="94"/>
+<wire x1="12.7" y1="10.16" x2="-12.7" y2="10.16" width="0.254" layer="94"/>
 </symbol>
 </symbols>
 <devicesets>
@@ -637,6 +665,28 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <attribute name="PACKAGE" value="SOT-23A" constant="no"/>
 <attribute name="SUPPLIER" value="Microchip" constant="no"/>
 </technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="ESP8266">
+<gates>
+<gate name="A" symbol="ESP8266" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="ESP8266">
+<connects>
+<connect gate="A" pin="CH_PD" pad="CH_PD"/>
+<connect gate="A" pin="DATA/GPIO2" pad="GPIO2"/>
+<connect gate="A" pin="GND" pad="GND"/>
+<connect gate="A" pin="GPIO0" pad="GPIO0"/>
+<connect gate="A" pin="RST" pad="GPIO16"/>
+<connect gate="A" pin="RX" pad="URXD"/>
+<connect gate="A" pin="TX" pad="UTXD"/>
+<connect gate="A" pin="VCC" pad="VCC"/>
+</connects>
+<technologies>
+<technology name=""/>
 </technologies>
 </device>
 </devices>
@@ -4035,6 +4085,9 @@ Source: AVX .. aphvc.pdf</description>
 <part name="C2" library="rcl" deviceset="C-EU" device="C0805" value="1u"/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="GND8" library="supply1" deviceset="GND" device=""/>
+<part name="U$1" library="lightstick" deviceset="ESP8266" device=""/>
+<part name="P+6" library="supply1" deviceset="+3V3" device=""/>
+<part name="GND9" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -4046,6 +4099,7 @@ Source: AVX .. aphvc.pdf</description>
 for normal operation: connect GPIO to +3V3</text>
 <text x="12.7" y="119.38" size="1.778" layer="91">UART</text>
 <text x="193.04" y="167.64" size="1.27" layer="91">Voltage regulator 5V -&gt; 3V3</text>
+<text x="86.36" y="104.14" size="1.27" layer="91">ESP 8266 controller</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
@@ -4073,6 +4127,9 @@ for normal operation: connect GPIO to +3V3</text>
 <instance part="C2" gate="G$1" x="241.3" y="152.4"/>
 <instance part="GND7" gate="1" x="185.42" y="142.24"/>
 <instance part="GND8" gate="1" x="241.3" y="142.24"/>
+<instance part="U$1" gate="A" x="111.76" y="83.82"/>
+<instance part="P+6" gate="G$1" x="86.36" y="99.06"/>
+<instance part="GND9" gate="1" x="86.36" y="68.58"/>
 </instances>
 <busses>
 </busses>
@@ -4124,6 +4181,12 @@ for normal operation: connect GPIO to +3V3</text>
 <pinref part="GND8" gate="1" pin="GND"/>
 <wire x1="241.3" y1="147.32" x2="241.3" y2="144.78" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="U$1" gate="A" pin="GND"/>
+<pinref part="GND9" gate="1" pin="GND"/>
+<wire x1="93.98" y1="76.2" x2="86.36" y2="76.2" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="76.2" x2="86.36" y2="71.12" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="+12V" class="0">
 <segment>
@@ -4161,25 +4224,16 @@ for normal operation: connect GPIO to +3V3</text>
 <junction x="185.42" y="154.94"/>
 </segment>
 </net>
-<net name="DATA/GPIO2" class="0">
-<segment>
-<pinref part="JP1" gate="A" pin="2"/>
-<wire x1="121.92" y1="25.4" x2="111.76" y2="25.4" width="0.1524" layer="91"/>
-<label x="111.76" y="25.4" size="1.27" layer="95" rot="R180" xref="yes"/>
-</segment>
-</net>
-<net name="GPIO0" class="0">
-<segment>
-<pinref part="JP2" gate="A" pin="2"/>
-<wire x1="33.02" y1="73.66" x2="22.86" y2="73.66" width="0.1524" layer="91"/>
-<label x="22.86" y="73.66" size="1.27" layer="95" rot="R180" xref="yes"/>
-</segment>
-</net>
 <net name="RX" class="0">
 <segment>
 <pinref part="JP3" gate="A" pin="1"/>
 <wire x1="27.94" y1="111.76" x2="17.78" y2="111.76" width="0.1524" layer="91"/>
 <label x="17.78" y="111.76" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="A" pin="RX"/>
+<wire x1="129.54" y1="91.44" x2="137.16" y2="91.44" width="0.1524" layer="91"/>
+<label x="137.16" y="91.44" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="TX" class="0">
@@ -4187,6 +4241,11 @@ for normal operation: connect GPIO to +3V3</text>
 <pinref part="JP3" gate="A" pin="2"/>
 <wire x1="27.94" y1="109.22" x2="17.78" y2="109.22" width="0.1524" layer="91"/>
 <label x="17.78" y="109.22" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="A" pin="TX"/>
+<wire x1="129.54" y1="86.36" x2="137.16" y2="86.36" width="0.1524" layer="91"/>
+<label x="137.16" y="86.36" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="+3V3" class="0">
@@ -4197,6 +4256,44 @@ for normal operation: connect GPIO to +3V3</text>
 <pinref part="U1" gate="A" pin="VOUT"/>
 <wire x1="231.14" y1="154.94" x2="241.3" y2="154.94" width="0.1524" layer="91"/>
 <junction x="241.3" y="154.94"/>
+</segment>
+<segment>
+<pinref part="U$1" gate="A" pin="VCC"/>
+<pinref part="P+6" gate="G$1" pin="+3V3"/>
+<wire x1="93.98" y1="91.44" x2="86.36" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="91.44" x2="86.36" y2="96.52" width="0.1524" layer="91"/>
+<pinref part="U$1" gate="A" pin="RST"/>
+<wire x1="93.98" y1="86.36" x2="86.36" y2="86.36" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="86.36" x2="86.36" y2="91.44" width="0.1524" layer="91"/>
+<junction x="86.36" y="91.44"/>
+<pinref part="U$1" gate="A" pin="CH_PD"/>
+<wire x1="93.98" y1="81.28" x2="86.36" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="81.28" x2="86.36" y2="86.36" width="0.1524" layer="91"/>
+<junction x="86.36" y="86.36"/>
+</segment>
+</net>
+<net name="PROGRAM" class="0">
+<segment>
+<pinref part="U$1" gate="A" pin="GPIO0"/>
+<wire x1="129.54" y1="81.28" x2="137.16" y2="81.28" width="0.1524" layer="91"/>
+<label x="137.16" y="81.28" size="1.27" layer="95" xref="yes"/>
+</segment>
+<segment>
+<pinref part="JP2" gate="A" pin="2"/>
+<wire x1="33.02" y1="73.66" x2="22.86" y2="73.66" width="0.1524" layer="91"/>
+<label x="22.86" y="73.66" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="DATA" class="0">
+<segment>
+<pinref part="U$1" gate="A" pin="DATA/GPIO2"/>
+<wire x1="129.54" y1="76.2" x2="137.16" y2="76.2" width="0.1524" layer="91"/>
+<label x="137.16" y="76.2" size="1.27" layer="95" xref="yes"/>
+</segment>
+<segment>
+<pinref part="JP1" gate="A" pin="2"/>
+<wire x1="121.92" y1="25.4" x2="111.76" y2="25.4" width="0.1524" layer="91"/>
+<label x="111.76" y="25.4" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 </nets>
