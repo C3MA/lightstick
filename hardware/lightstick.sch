@@ -4042,8 +4042,8 @@ Source: AVX .. aphvc.pdf</description>
 <text x="10.16" y="43.18" size="1.778" layer="91">power supply</text>
 <text x="106.68" y="35.56" size="1.778" layer="91">to LED stripe</text>
 <text x="17.78" y="83.82" size="1.778" layer="91">programming switch</text>
-<text x="10.16" y="55.88" size="1.778" layer="91">for programming: connect GPIO0 to +3V3
-for normal operation: connect GPIO to GND</text>
+<text x="10.16" y="55.88" size="1.778" layer="91">for programming: connect GPIO0 to GND
+for normal operation: connect GPIO to +3V3</text>
 <text x="12.7" y="119.38" size="1.778" layer="91">UART</text>
 <text x="193.04" y="167.64" size="1.27" layer="91">Voltage regulator 5V -&gt; 3V3</text>
 </plain>
