@@ -391,6 +391,12 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <text x="-2.54" y="-2.54" size="1.778" layer="96">&gt;VALUE</text>
 <pin name="GND" x="0" y="2.54" visible="off" length="short" direction="sup" rot="R270"/>
 </symbol>
+<symbol name="+3V3">
+<wire x1="1.27" y1="-1.905" x2="0" y2="0" width="0.254" layer="94"/>
+<wire x1="0" y1="0" x2="-1.27" y2="-1.905" width="0.254" layer="94"/>
+<text x="-2.54" y="-5.08" size="1.778" layer="96" rot="R90">&gt;VALUE</text>
+<pin name="+3V3" x="0" y="-2.54" visible="off" length="short" direction="sup" rot="R90"/>
+</symbol>
 <symbol name="+5V">
 <wire x1="1.27" y1="-1.905" x2="0" y2="0" width="0.254" layer="94"/>
 <wire x1="0" y1="0" x2="-1.27" y2="-1.905" width="0.254" layer="94"/>
@@ -416,6 +422,19 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
 <gates>
 <gate name="1" symbol="GND" x="0" y="0"/>
+</gates>
+<devices>
+<device name="">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="+3V3" prefix="+3V3">
+<description>&lt;b&gt;SUPPLY SYMBOL&lt;/b&gt;</description>
+<gates>
+<gate name="G$1" symbol="+3V3" x="0" y="0"/>
 </gates>
 <devices>
 <device name="">
@@ -569,12 +588,18 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <part name="JP1" library="pinhead" deviceset="PINHD-1X3" device=""/>
 <part name="P+3" library="supply1" deviceset="+5V" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
+<part name="JP2" library="pinhead" deviceset="PINHD-1X3" device=""/>
+<part name="P+4" library="supply1" deviceset="+3V3" device=""/>
+<part name="GND4" library="supply1" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
 <plain>
 <text x="10.16" y="43.18" size="1.778" layer="91">power supply</text>
 <text x="106.68" y="35.56" size="1.778" layer="91">to LED stripe</text>
+<text x="152.4" y="68.58" size="1.778" layer="91">programming switch</text>
+<text x="144.78" y="40.64" size="1.778" layer="91">for programming: connect GPIO0 to +3V3
+for normal operation: connect GPIO to GND</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
@@ -589,6 +614,9 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <instance part="JP1" gate="A" x="124.46" y="25.4"/>
 <instance part="P+3" gate="1" x="111.76" y="33.02"/>
 <instance part="GND3" gate="1" x="111.76" y="17.78"/>
+<instance part="JP2" gate="A" x="170.18" y="58.42"/>
+<instance part="P+4" gate="G$1" x="157.48" y="66.04"/>
+<instance part="GND4" gate="1" x="157.48" y="50.8"/>
 </instances>
 <busses>
 </busses>
@@ -612,6 +640,12 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <wire x1="121.92" y1="22.86" x2="111.76" y2="22.86" width="0.1524" layer="91"/>
 <wire x1="111.76" y1="22.86" x2="111.76" y2="20.32" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="JP2" gate="A" pin="3"/>
+<pinref part="GND4" gate="1" pin="GND"/>
+<wire x1="167.64" y1="55.88" x2="157.48" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="157.48" y1="55.88" x2="157.48" y2="53.34" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="+12V" class="0">
 <segment>
@@ -634,12 +668,25 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 <wire x1="121.92" y1="27.94" x2="111.76" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="111.76" y1="27.94" x2="111.76" y2="30.48" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="JP2" gate="A" pin="1"/>
+<pinref part="P+4" gate="G$1" pin="+3V3"/>
+<wire x1="167.64" y1="60.96" x2="157.48" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="157.48" y1="60.96" x2="157.48" y2="63.5" width="0.1524" layer="91"/>
+</segment>
 </net>
-<net name="DATA" class="0">
+<net name="DATA/GPIO2" class="0">
 <segment>
 <pinref part="JP1" gate="A" pin="2"/>
 <wire x1="121.92" y1="25.4" x2="111.76" y2="25.4" width="0.1524" layer="91"/>
 <label x="111.76" y="25.4" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="GPIO0" class="0">
+<segment>
+<pinref part="JP2" gate="A" pin="2"/>
+<wire x1="167.64" y1="58.42" x2="157.48" y2="58.42" width="0.1524" layer="91"/>
+<label x="157.48" y="58.42" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 </nets>
@@ -647,4 +694,10 @@ Nennquerschnitt Stecker: 1,5qmm eindrähtig / 1qmm feinstdrähtig</description>
 </sheets>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>
