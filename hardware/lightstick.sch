@@ -11238,9 +11238,7 @@ for normal operation: connect GPIO to +3V3</text>
 <text x="12.7" y="119.38" size="1.778" layer="91">UART</text>
 <text x="109.22" y="167.64" size="1.27" layer="91">Voltage regulator 5V -&gt; 3V3</text>
 <text x="17.78" y="170.18" size="1.27" layer="91">ESP 8266 controller</text>
-<text x="154.94" y="86.36" size="1.778" layer="91" rot="R90">TODO: verify device case</text>
 <text x="137.16" y="86.36" size="1.778" layer="91" rot="R90">TODO: verify device case</text>
-<text x="91.44" y="88.9" size="1.778" layer="91" rot="R90">TODO: verify device case</text>
 <text x="104.14" y="129.54" size="1.778" layer="91">12V -&gt; 5V voltage regulator</text>
 </plain>
 <instances>
