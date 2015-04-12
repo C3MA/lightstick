@@ -11220,7 +11220,7 @@ diameter 5 mm, horizontal, grid 15.24 mm</description>
 <part name="L1" library="Inductor-Fastron" deviceset="L-EU" device="PISR"/>
 <part name="D1" library="diode" deviceset="SCHOTTKY-DIODE" device="SMC"/>
 <part name="GND13" library="supply1" deviceset="GND" device=""/>
-<part name="C3" library="rcl" deviceset="CPOL-EU" device="140CLH-0810"/>
+<part name="C3" library="rcl" deviceset="CPOL-EU" device="140CLH-0810" value="100u"/>
 <part name="C4" library="rcl" deviceset="CPOL-EU" device="140CLH-0810" value="470u"/>
 <part name="GND14" library="supply1" deviceset="GND" device=""/>
 <part name="GND15" library="supply1" deviceset="GND" device=""/>
