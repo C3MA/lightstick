@@ -42,7 +42,7 @@ if [ ! -f $2 ]; then
  usage
 fi
 
-if [ $IP != "" ]; then
+if [ "$IP" != "" ]; then
     echo "Using network: $IP "
     echo "Checking connection ..."
     ping -c 3 $IP >> /dev/null
@@ -62,7 +62,7 @@ else
   echo "========================="
   echo "" >> $DEVICE; sleep $SLEEPTIME
   echo "file.open(\"$3\",\"w\")" >> $DEVICE; sleep $SLEEPTIME
-  cat $2 | while read a; do echo "file.writeline([[${a}]])" >> $DEVICE; echo -e "\r" >> $DEVICE; echo "$a"; sleep $SLEEPTIME; done
+  cat $2 | while read a; do echo "file.writeline([[${a}]])" >> $DEVICE; echo "$a"; sleep $SLEEPTIME; done
   # Close the init file
   echo "file.close()" >> $DEVICE; sleep $SLEEPTIME
   echo "========================="
