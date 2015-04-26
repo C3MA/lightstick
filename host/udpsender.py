@@ -3,6 +3,7 @@ from array import array
 import time
 
 IP_BASE = "192.168.23"
+IP4LOAD = "192.168.23.91"
 STICK_COUNT=3
 UDP_PORT = 2342
 
@@ -26,6 +27,8 @@ while True:
 		message.extend(blue)
 		for i in range(1,STICK_COUNT+1):
 			sock.sendto(message, (IP_BASE + "." + str(i) , UDP_PORT))
+		for i in range(1,70):
+			sock.sendto(message, (IP4LOAD , UDP_PORT))
 		time.sleep(TIME)
 	for y in range(60):
 		x=60-y
@@ -38,4 +41,6 @@ while True:
 		message.extend(space)
 		for i in range(1,STICK_COUNT+1):
 			sock.sendto(message, (IP_BASE + "." + str(i), UDP_PORT))
+		for i in range(1,70):
+			sock.sendto(message, (IP4LOAD , UDP_PORT))
 		time.sleep(TIME)
