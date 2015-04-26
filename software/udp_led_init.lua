@@ -38,7 +38,7 @@ tmr.alarm(1, 200, 1, function()
    if wifi.sta.getip()=="0.0.0.0" or wifi.sta.getip() == nil then
       print("Connect AP, Waiting...") 
       if counter == 0 then
-          ws2812.writergb(4, string.char(0, 255, 0):rep(60))
+          ws2812.writergb(4, string.char(0, 60, 0):rep(60))
 	  counter=1
       else
           ws2812.writergb(4, string.char(0, 0, 0):rep(60))
@@ -59,7 +59,7 @@ tmr.alarm(1, 200, 1, function()
       tenth=math.floor(lastIP / 10)
       lastIP=lastIP-tenth*10
       ones=lastIP
-      ws2812.writergb(4, string.char(255, 0, 0):rep(hundred) .. string.char(0,255,0):rep(tenth) .. string.char(0,0,255):rep(ones) )
+      ws2812.writergb(4, string.char(30, 0, 0):rep(hundred) .. string.char(0,30,0):rep(tenth) .. string.char(0,0,30):rep(ones) )
 
       startUDPServer()
       startTelnetServer()
