@@ -13,7 +13,7 @@ blue=array('B',[0,0,50])
 space = array('B',[0,0,0])
 
 
-TIME=0.01
+TIME=0.03
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -48,8 +48,10 @@ def generateDot():
 
 while True:
 	message = generateDot()
-	for i in range(1,STICK_COUNT+1):
-		sock.sendto(message, (IP_BASE + "." + str(i) , UDP_PORT))
-	for i in range(1,70):
-		sock.sendto(message, (IP4LOAD , UDP_PORT))
-	time.sleep(TIME)
+	factor=3
+	for times in range(factor):
+		for i in range(1,STICK_COUNT+1):
+			sock.sendto(message, (IP_BASE + "." + str(i) , UDP_PORT))
+		for i in range(1,70):
+			sock.sendto(message, (IP4LOAD , UDP_PORT))
+		time.sleep(TIME/factor)
