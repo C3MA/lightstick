@@ -56,7 +56,7 @@ fi
 # The flashing logic
 if [ "$3" == "" ]; then
   echo "Sending to shell..."
-  cat $2  | while read a; do echo -e "$a\r" >> $DEVICE; echo -e "$a"; sleep $SLEEPTIME; done
+  cat $2  | while read a; do echo -e "$a\r" >> $DEVICE; if [ "$IP" != "" ]; then echo -e "\n" >> $DEVICE; fi; echo -e "$a"; sleep $SLEEPTIME; done
 else
   echo "Writing $3 on the ESP"
   echo "========================="
