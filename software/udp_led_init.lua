@@ -1,6 +1,6 @@
 print("Booting... Lightstick v0.10")
 wifi.setmode(wifi.STATION)
-wifi.sta.config("SSID","password")
+wifi.sta.config("sticknet","stickpw1")
 
 function startUDPServer()
   s=net.createServer(net.UDP)
