@@ -17,30 +17,39 @@ TIME=0.01
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+up=True
+x=0
+def generateDot():
+	global up
+	global x
+	message = array('B')
+	if up:
+		if x < 60:		
+			for s in range(0, x):
+				message.extend(space)
+			message.extend(red)
+			message.extend(green)
+			message.extend(blue)
+			x=x+1
+		else:
+			up=False
+	else:
+		if x > 0:
+			for s in range(0, x):
+				message.extend(space)
+                        message.extend(red)
+                        message.extend(green)
+                        message.extend(blue)
+			message.extend(space)
+			x=x-1
+		else:
+			up=True
+	return message	
+
 while True:
-	for x in range(60):
-		message = array('B')
-		for s in range(0, x):
-			message.extend(space)
-		message.extend(red)
-		message.extend(green)
-		message.extend(blue)
-		for i in range(1,STICK_COUNT+1):
-			sock.sendto(message, (IP_BASE + "." + str(i) , UDP_PORT))
-		for i in range(1,70):
-			sock.sendto(message, (IP4LOAD , UDP_PORT))
-		time.sleep(TIME)
-	for y in range(60):
-		x=60-y
-		message = array('B')
-		for s in range(0, x):
-			message.extend(space)
-		message.extend(blue)
-		message.extend(green)
-		message.extend(red)
-		message.extend(space)
-		for i in range(1,STICK_COUNT+1):
-			sock.sendto(message, (IP_BASE + "." + str(i), UDP_PORT))
-		for i in range(1,70):
-			sock.sendto(message, (IP4LOAD , UDP_PORT))
-		time.sleep(TIME)
+	message = generateDot()
+	for i in range(1,STICK_COUNT+1):
+		sock.sendto(message, (IP_BASE + "." + str(i) , UDP_PORT))
+	for i in range(1,70):
+		sock.sendto(message, (IP4LOAD , UDP_PORT))
+	time.sleep(TIME)
