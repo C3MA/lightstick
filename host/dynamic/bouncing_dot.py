@@ -1,15 +1,15 @@
 import socket
 from array import array
 import time
+import sys
 
 IP_EMULATOR = "192.168.23.5"
 UDP_PORT = 2342
+STICK_COUNT=3
 
-header=array('B', [1,0,0,0])
-
-red=array('B',[50,0,0])
-green=array('B',[0,50,0])
-blue=array('B',[0,0,50])
+red=array('B',[255,0,0])
+green=array('B',[0,255,0])
+blue=array('B',[0,0,255])
 space = array('B',[0,0,0])
 
 
@@ -20,10 +20,11 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 up=True
 x=0
-def generateDot():
+def generateDot(position):
 	global up
 	global x
 	message = array('B')
+	header=array('B', [position,0,0,0])
 	message.extend(header)
 	if up:
 		if x < 60:		
@@ -48,8 +49,21 @@ def generateDot():
 			up=True
 	return message	
 
-while True:
-	message = generateDot()
-	for times in range(UPDATE_FACTOR):
-		sock.sendto(message, (IP_EMULATOR , UDP_PORT))
-		time.sleep(TIME/UPDATE_FACTOR)
+def main(argv):
+    if len(argv) < 2:
+        sys.stderr.write("Usage: %s <database>\n" % (argv[0],))
+        return 1
+
+    if not os.path.exists(argv[1]):
+        sys.stderr.write("ERROR: Database %r was not found!\n" % (argv[1],))
+        return 1
+
+	while True:
+		for times in range(UPDATE_FACTOR):
+			for i in range(1,STICK_COUNT+1):
+				message = generateDot(i)
+				sock.sendto(message, (IP_EMULATOR , UDP_PORT))
+				time.sleep(TIME/UPDATE_FACTOR)
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
