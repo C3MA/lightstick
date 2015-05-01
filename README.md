@@ -6,10 +6,21 @@
 * UDP-Port 2342 RGB information
 
 ## UDP RGB Protocol
+* Header
+  * ID (one byte) - uniq identifier of one ledstick
+  * Delay (one byte in ms)
+  * timestamp in milliseconds only last two bytes
+* RGB
+  * LED1
+    * red (one byte)
+    * green (one byte)
+    * blue (one byte)
+  * LED2
+    * red (one byte)
+    * green (one byte)
+    * blue (one byte)
 
-* ID (one byte) - uniq identifier of one ledstick
-* Delay (one byte in ms)
-* timestamp in milliseconds only last two bytes
+
 Header is at the moment 4 bytes
 
 # Links
