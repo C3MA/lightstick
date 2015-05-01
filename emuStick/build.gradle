@@ -4,6 +4,7 @@ compileJava.options.encoding = 'UTF-8'
 
 apply plugin: 'maven'
 apply plugin: 'eclipse'
+apply plugin: 'gradle-one-jar'
 
 version = "1.0.0-SNAPSHOT"
 
@@ -13,14 +14,15 @@ repositories {
 	maven { url "https://oss.sonatype.org/content/groups/public"}
 }
 
-sourceSets.main.resources.srcDir 'src/main/java'
-
-task packageSources(type: Jar) {
-	from sourceSets.main.allSource
-	classifier = 'sources'
+task deploy(type: OneJar) {
+    mainClass = 'de.c3ma.emuStick.EmuStick'
 }
 
-
-dependencies {
-	//compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.9'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
 }
