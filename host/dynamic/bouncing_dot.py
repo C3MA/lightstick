@@ -2,10 +2,10 @@ import socket
 from array import array
 import time
 
-IP_BASE = "192.168.23"
-IP4LOAD = "192.168.23.91"
-STICK_COUNT=3
+IP_EMULATOR = "192.168.23.5"
 UDP_PORT = 2342
+
+header=array('B', [1,0,0,0])
 
 red=array('B',[50,0,0])
 green=array('B',[0,50,0])
@@ -24,6 +24,7 @@ def generateDot():
 	global up
 	global x
 	message = array('B')
+	message.extend(header)
 	if up:
 		if x < 60:		
 			for s in range(0, x):
@@ -50,8 +51,5 @@ def generateDot():
 while True:
 	message = generateDot()
 	for times in range(UPDATE_FACTOR):
-		for i in range(1,STICK_COUNT+1):
-			sock.sendto(message, (IP_BASE + "." + str(i) , UDP_PORT))
-		for i in range(1,70):
-			sock.sendto(message, (IP4LOAD , UDP_PORT))
+		sock.sendto(message, (IP_EMULATOR , UDP_PORT))
 		time.sleep(TIME/UPDATE_FACTOR)
