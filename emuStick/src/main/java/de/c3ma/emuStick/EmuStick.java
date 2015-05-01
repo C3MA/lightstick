@@ -32,6 +32,8 @@ public class EmuStick {
 		@SuppressWarnings("resource")
 		final DatagramSocket socket = new DatagramSocket(2342);
 
+		EmuStick.getStick(1, frame);
+
 		new Thread() {
 			@Override
 			public void run() {
