@@ -5,7 +5,7 @@
 * TCP-Port 2323 Telnet/Netcat
 * UDP-Port 2342 RGB information
 
-## UDP RGP Protocol
+## UDP RGB Protocol
 
 * ID (one byte) - uniq identifier of one ledstick
 * Delay (one byte in ms)
