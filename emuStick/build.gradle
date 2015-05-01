@@ -1,5 +1,5 @@
 apply plugin: 'java'
-sourceCompatibility=JavaVersion.VERSION_1_8
+sourceCompatibility=JavaVersion.VERSION_1_7
 compileJava.options.encoding = 'UTF-8'
 
 apply plugin: 'maven'

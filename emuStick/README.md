@@ -1,6 +1,3 @@
-schritt 1
-gradle installieren (packetmanager oder download von deren seite)
-
 für eclipse
 ./gradlew eclipse
 
