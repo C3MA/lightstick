@@ -8,6 +8,14 @@ apply plugin: 'gradle-one-jar'
 
 version = "1.0.0-SNAPSHOT"
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
 
 repositories {
 	mavenCentral()
@@ -16,13 +24,4 @@ repositories {
 
 task deploy(type: OneJar) {
     mainClass = 'de.c3ma.emuStick.EmuStick'
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
-    }
 }
