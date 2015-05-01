@@ -19,7 +19,7 @@
     * red (one byte)
     * green (one byte)
     * blue (one byte)
-
+  * LED ...
 
 Header is at the moment 4 bytes
 
