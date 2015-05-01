@@ -1,0 +1,28 @@
+apply plugin: 'java'
+sourceCompatibility=JavaVersion.VERSION_1_8
+compileJava.options.encoding = 'UTF-8'
+
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+apply plugin: 'gradle-one-jar'
+
+version = "1.0.0-SNAPSHOT"
+
+
+repositories {
+	mavenCentral()
+	maven { url "https://oss.sonatype.org/content/groups/public"}
+}
+
+task deploy(type: OneJar) {
+    mainClass = 'de.c3ma.emuStick.EmuStick'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+    }
+}
