@@ -51,8 +51,11 @@ def generateDot(position):
 
 def main(argv):
     if len(argv) < 2:
-        sys.stderr.write("Usage: %s <database>\n" % (argv[0],))
+        sys.stderr.write("Usage: %s <esp|simulator> (IP if simulator)\n" % (argv[0],))
         return 1
+
+    if argv[1] == "esp":
+	print("Use the hardware\n") 
 
     if not os.path.exists(argv[1]):
         sys.stderr.write("ERROR: Database %r was not found!\n" % (argv[1],))
