@@ -24,5 +24,5 @@ sudo ./programESP.sh serial udp_led_init.lua init.lua
 After the logic has be integrated once, it can be updated remote via TCP:
 ```
 cd init-lua/
-./programESP.sh 192.168.23.1 test_init.lua init.lua
+./programESP.sh 192.168.23.1 udp_led_init.lua init.lua
 ```
