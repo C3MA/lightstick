@@ -43,6 +43,8 @@ def generateDot(position):
                         message.extend(green)
                         message.extend(blue)
                         message.extend(space)
+                        message.extend(space)
+                        message.extend(space)
                         x=x-1
                 else:
                         up=True
