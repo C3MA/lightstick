@@ -1,11 +1,13 @@
-print("Booting... Lightstick v0.30")
+print("Booting... Lightstick v0.40")
 wifi.setmode(wifi.STATION)
 wifi.sta.config("sticknet","stickpw1")
 
 function startUDPServer()
   s=net.createServer(net.UDP)
   s:on("receive",function(s,c) 
-    ws2812.writergb(4, c)
+    -- remove header
+    data=string.sub(c, 4)
+    ws2812.writergb(4, data)
   end)
   s:listen(2342)
   print ("UDP Server started")
