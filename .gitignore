@@ -34,3 +34,9 @@ eagle.epf
 *.info
 
 *.eps
+.gradle/
+bin/
+build/
+*.so
+*.dll
+.settings/
