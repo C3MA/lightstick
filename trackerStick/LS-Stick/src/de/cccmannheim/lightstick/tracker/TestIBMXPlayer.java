@@ -5,25 +5,33 @@ import ibxm.jme.IBXMAdvancedLoader;
 import ibxm.jme.IBXMLoader;
 import ibxm.jme.NoteInfo;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.lwjgl.input.Keyboard;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetInfo;
 import com.jme3.asset.plugins.ClasspathLocator;
+import com.jme3.asset.plugins.FileLocator;
 import com.jme3.audio.AudioKey;
 import com.jme3.audio.AudioNode;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.shape.Box;
+import com.jme3.input.RawInputListener;
+import com.jme3.input.event.JoyAxisEvent;
+import com.jme3.input.event.JoyButtonEvent;
+import com.jme3.input.event.KeyInputEvent;
+import com.jme3.input.event.MouseButtonEvent;
+import com.jme3.input.event.MouseMotionEvent;
+import com.jme3.input.event.TouchEvent;
 import com.jme3.system.AppSettings;
 
 public class TestIBMXPlayer extends SimpleApplication {
@@ -38,41 +46,114 @@ public class TestIBMXPlayer extends SimpleApplication {
 		t.start();
 	}
 
+	final byte[][]									packet		= new byte[TestIBMXPlayer.STICK_COUNT][61 * 3 + 4];
 	private AudioNode								anode;
 	private float									playtime	= -1;
 	protected ConcurrentHashMap<Float, NoteInfo>	todispatch	= new ConcurrentHashMap<>();
-	private Material[]								mat;
 
 	final static int								STICK_COUNT	= 3;
-	final ColorRGBA[]								sticks;
 
 	DatagramSocket									datagramSocket;
+	private File									folder;
 
 	public TestIBMXPlayer() throws SocketException {
-		this.sticks = new ColorRGBA[TestIBMXPlayer.STICK_COUNT];
-		this.mat = new Material[TestIBMXPlayer.STICK_COUNT];
-		for (int i = 0; i < TestIBMXPlayer.STICK_COUNT; i++) {
-			this.sticks[i] = new ColorRGBA();
-		}
 		this.setShowSettings(false);
 		this.datagramSocket = new DatagramSocket();
 	}
 
 	@Override
 	public void simpleInitApp() {
+		this.folder = new File("/home/empire/Desktop/KEYGENMUSiC MusicPack");
+
 		this.setPauseOnLostFocus(false);
 
 		this.flyCam.setDragToRotate(true);
 		this.assetManager.registerLoader(IBXMLoader.class, "mod");
 		this.assetManager.registerLocator("de/cccmannheim/lightstick/tracker", ClasspathLocator.class);
+		this.assetManager.registerLocator(this.folder.getAbsolutePath(), FileLocator.class);
 
-		final AudioKey ak = new AudioKey("tiara (1).xm", true);
+		this.play("pinball_illusions.mod");
+
+		this.inputManager.addRawInputListener(new RawInputListener() {
+
+			@Override
+			public void onTouchEvent(final TouchEvent evt) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onMouseMotionEvent(final MouseMotionEvent evt) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onMouseButtonEvent(final MouseButtonEvent evt) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onKeyEvent(final KeyInputEvent evt) {
+				if (evt.isReleased() && evt.getKeyCode() == Keyboard.KEY_SPACE) {
+					final File[] folders = TestIBMXPlayer.this.folder.listFiles();
+					final int folderindex = (int) Math.round(Math.random() * folders.length - 1);
+					if (folderindex < 0) {
+						return;
+					}
+					final File[] files = folders[folderindex].listFiles();
+					final int fileindex = (int) Math.round(Math.random() * files.length - 1);
+					if (fileindex < 0) {
+						return;
+					}
+					final File file = files[fileindex];
+					if (file.getName().endsWith(".xm") || file.getName().endsWith(".mod") || file.getName().endsWith(".s3m")) {
+						final Path relative = TestIBMXPlayer.this.folder.toPath().relativize(file.toPath());
+						TestIBMXPlayer.this.play(relative.toString());
+					}
+				}
+			}
+
+			@Override
+			public void onJoyButtonEvent(final JoyButtonEvent evt) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void onJoyAxisEvent(final JoyAxisEvent evt) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void endInput() {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void beginInput() {
+				// TODO Auto-generated method stub
+
+			}
+		});
+
+	}
+
+	private void play(final String fname) {
+		if (this.anode != null) {
+			this.anode.stop();
+			this.anode = null;
+		}
+		final AudioKey ak = new AudioKey(fname, true);
 		final AssetInfo loadInfo = this.assetManager.locateAsset(ak);
 		try {
 			final IBXMAdvancedLoader al = new IBXMAdvancedLoader(loadInfo, new INoteListener() {
 				@Override
-				public void onNote(final float posInSec, final int note, final int volume, final int noteKey, final int fadeoutVol, final int instrumentid) {
-					TestIBMXPlayer.this.todispatch.put(posInSec, new NoteInfo(note, volume, noteKey, fadeoutVol, instrumentid));
+				public void onNote(final float posInSec, final int note, final int volume, final int noteKey, final int fadeoutVol, final int instrumentid, final int panning) {
+					TestIBMXPlayer.this.todispatch.put(posInSec, new NoteInfo(note, volume, noteKey, fadeoutVol, instrumentid, panning));
 				}
 			});
 			this.anode = new AudioNode(al.getAudioData(), ak);
@@ -81,38 +162,24 @@ public class TestIBMXPlayer extends SimpleApplication {
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
-
-		for (int stickid = 0; stickid < TestIBMXPlayer.STICK_COUNT; stickid++) {
-			final Geometry geom = new Geometry("Box", new Box(0.5f, 0.5f, 0.5f));
-			this.mat[stickid] = new Material(this.assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-			geom.setMaterial(this.mat[stickid]);
-			geom.setLocalTranslation((stickid - TestIBMXPlayer.STICK_COUNT / 2f), 0, 0);
-			this.rootNode.attachChild(geom);
-		}
-
 	}
 
 	@Override
 	public void simpleUpdate(final float tpf) {
 		this.playtime += tpf;
 		final List<Float> removeKeys = new ArrayList<>();
+
 		for (final Entry<Float, NoteInfo> ee : this.todispatch.entrySet()) {
 			if (ee.getKey() < this.playtime) {
 				final NoteInfo note = ee.getValue();
 				removeKeys.add(ee.getKey());
 
-				final int stickid = note.instrumentid % TestIBMXPlayer.STICK_COUNT;
-				final int channel = note.note % 3;
-				if (channel == 0) {
-					this.sticks[stickid].b = note.volume / 64f * note.globalVolume / 64f;
-				}
-				if (channel == 1) {
-					this.sticks[stickid].g = note.volume / 64f * note.globalVolume / 64f;
-				}
-				if (channel == 2) {
-					this.sticks[stickid].r = note.volume / 64f * note.globalVolume / 64f;
-				}
-				System.out.println(note.note + " " + note.noteKey + " " + note.globalVolume);
+				final int stickid = note.note % TestIBMXPlayer.STICK_COUNT;
+				final int channel = note.instrumentid % 3;
+				final int ledid = note.note * note.panning % 20 * 3 + channel;
+				this.packet[stickid][ledid] = (byte) ((note.volume / 64f * note.globalVolume / 64f) * 128);
+				this.packet[stickid][ledid + (20 * 3)] = (byte) ((note.volume / 64f * note.globalVolume / 64f) * 128);
+				this.packet[stickid][ledid + (40 * 3)] = (byte) ((note.volume / 64f * note.globalVolume / 64f) * 128);
 			}
 		}
 		for (final Float r : removeKeys) {
@@ -120,30 +187,18 @@ public class TestIBMXPlayer extends SimpleApplication {
 		}
 
 		for (int stickid = 0; stickid < TestIBMXPlayer.STICK_COUNT; stickid++) {
-
-			this.sticks[stickid].r = this.sticks[stickid].r * TestIBMXPlayer.FADE_TIME;
-			this.sticks[stickid].g = this.sticks[stickid].g * TestIBMXPlayer.FADE_TIME;
-			this.sticks[stickid].b = this.sticks[stickid].b * TestIBMXPlayer.FADE_TIME;
-
-			final byte[] packet = new byte[61 * 3 + 4];
-
-			for (int i = 3; i < 60 * 3 + 4; i = i + 3) {
-				packet[i] = (byte) (this.sticks[stickid].b * 128);
-				packet[i + 1] = (byte) (this.sticks[stickid].r * 128);
-				packet[i + 2] = (byte) (this.sticks[stickid].g * 128);
+			this.packet[stickid][0] = (byte) (stickid + 1);
+			for (int i = 3; i < this.packet[stickid].length; i++) {
+				this.packet[stickid][i] = (byte) Math.floor((this.packet[stickid][i] * 0.8f));
 			}
-
-			packet[0] = (byte) (stickid + 1);
 
 			try {
 				final InetAddress address = InetAddress.getByName("192.168.23." + (stickid + 1));
-				final DatagramPacket pp = new DatagramPacket(packet, packet.length, address, 2342);
+				final DatagramPacket pp = new DatagramPacket(this.packet[stickid], this.packet[stickid].length, address, 2342);
 				this.datagramSocket.send(pp);
 			} catch (final IOException e) {
 				e.printStackTrace();
 			}
-
-			this.mat[stickid].setColor("Color", this.sticks[stickid]);
 		}
 	}
 }
