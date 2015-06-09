@@ -25,3 +25,13 @@ Header is at the moment 4 bytes
 
 # Links
 * https://www.ccc-mannheim.de/wiki/ESP8266/Lightstick
+
+
+#TrackerStick
+Tracker files player (xm,mod,s3m) that creates light patterns based on the used notes and instruments in the tracker file.
+
+
+Examples using the EmuStick software:
+
+ * https://www.youtube.com/watch?v=BA6pZhu4QjQ
+ * https://www.youtube.com/watch?v=6QiemtzXNDI
