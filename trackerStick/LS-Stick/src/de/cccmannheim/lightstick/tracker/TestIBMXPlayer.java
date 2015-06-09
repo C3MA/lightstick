@@ -48,7 +48,7 @@ public class TestIBMXPlayer extends SimpleApplication {
 
 	final byte[][]									packet		= new byte[TestIBMXPlayer.STICK_COUNT][61 * 3 + 4];
 	private AudioNode								anode;
-	private float									playtime	= -1;
+	private float									playtime	= 0;
 	protected ConcurrentHashMap<Float, NoteInfo>	todispatch	= new ConcurrentHashMap<>();
 
 	final static int								STICK_COUNT	= 3;
@@ -63,7 +63,7 @@ public class TestIBMXPlayer extends SimpleApplication {
 
 	@Override
 	public void simpleInitApp() {
-		this.folder = new File("/home/empire/Desktop/KEYGENMUSiC MusicPack");
+		this.folder = new File("./music");
 
 		this.setPauseOnLostFocus(false);
 
@@ -97,12 +97,7 @@ public class TestIBMXPlayer extends SimpleApplication {
 			@Override
 			public void onKeyEvent(final KeyInputEvent evt) {
 				if (evt.isReleased() && evt.getKeyCode() == Keyboard.KEY_SPACE) {
-					final File[] folders = TestIBMXPlayer.this.folder.listFiles();
-					final int folderindex = (int) Math.round(Math.random() * folders.length - 1);
-					if (folderindex < 0) {
-						return;
-					}
-					final File[] files = folders[folderindex].listFiles();
+					final File[] files = TestIBMXPlayer.this.folder.listFiles();
 					final int fileindex = (int) Math.round(Math.random() * files.length - 1);
 					if (fileindex < 0) {
 						return;
@@ -193,7 +188,8 @@ public class TestIBMXPlayer extends SimpleApplication {
 			}
 
 			try {
-				final InetAddress address = InetAddress.getByName("192.168.23." + (stickid + 1));
+				final InetAddress address = InetAddress.getByName("127.0.0.1");
+				// final InetAddress address = InetAddress.getByName("192.168.23." + (stickid + 1));
 				final DatagramPacket pp = new DatagramPacket(this.packet[stickid], this.packet[stickid].length, address, 2342);
 				this.datagramSocket.send(pp);
 			} catch (final IOException e) {
