@@ -82,6 +82,9 @@ public class EmuStick {
 		}
 		final DataInputStream read = new DataInputStream(new ByteArrayInputStream(data));
 		final byte id = read.readByte();
+		if (id < 0) {
+			System.out.println("invalid stickid! " + id);
+		}
 		final Stick stick = EmuStick.getStick(id, frame);
 		final byte delay = read.readByte();
 		// TODO delay sometime
