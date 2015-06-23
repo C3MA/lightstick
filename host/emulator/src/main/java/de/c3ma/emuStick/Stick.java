@@ -9,8 +9,8 @@ import javax.swing.JPanel;
 
 public class Stick extends JPanel implements Comparable<Stick> {
 	public static boolean	VERBOSE_ERROR_CHECKING	= false;
-	public static int		LEDSIZE_HEIGHT			= 950 / 60;
-	public static int		LEDSIZE_WIDTH			= 950 / 60;
+	public static int		LEDSIZE_HEIGHT			= 500 / 60;
+	public static int		LEDSIZE_WIDTH			= 500 / 60;
 	public static int		LEDCOUNT				= 63;
 	public static int		FONTSIZE				= 12;
 	public static int		LEDGAP					= 1;
