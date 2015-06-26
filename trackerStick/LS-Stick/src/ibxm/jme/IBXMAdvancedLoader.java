@@ -16,7 +16,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.SourceDataLine;
 
 public class IBXMAdvancedLoader {
-	private static final int	SAMPLE_RATE	= 48000, FADE_SECONDS = 16, REVERB_MILLIS = 50;
+	private static final int	SAMPLE_RATE	= 18000, FADE_SECONDS = 16, REVERB_MILLIS = 50;
 	private int					duration;
 	private Module				module;
 	private IBXM				ibxm;
@@ -65,7 +65,7 @@ public class IBXMAdvancedLoader {
 					try {
 						audioFormat = new AudioFormat(IBXMAdvancedLoader.SAMPLE_RATE, 16, 2, true, true);
 						IBXMAdvancedLoader.this.audioLine = AudioSystem.getSourceDataLine(audioFormat);
-						IBXMAdvancedLoader.this.audioLine.open(audioFormat, 4000);
+						IBXMAdvancedLoader.this.audioLine.open(audioFormat, 8000);
 						IBXMAdvancedLoader.this.audioLine.start();
 						while (IBXMAdvancedLoader.this.playing) {
 
@@ -83,6 +83,9 @@ public class IBXMAdvancedLoader {
 								outBuf[outIdx++] = (byte) ampl;
 							}
 							IBXMAdvancedLoader.this.audioLine.write(outBuf, 0, outIdx);
+							if (IBXMAdvancedLoader.this.ibxm.isEnd()) {
+								IBXMAdvancedLoader.this.playing = false;
+							}
 						}
 						IBXMAdvancedLoader.this.audioLine.drain();
 					} catch (final Exception e) {

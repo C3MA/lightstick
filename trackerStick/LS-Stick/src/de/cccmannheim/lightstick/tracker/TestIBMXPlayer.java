@@ -11,6 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TestIBMXPlayer {
 	static File															folder		= new File("./music");
 	private static boolean												TEST_NODE	= false;
-	static final float[][]												packet		= new float[TestIBMXPlayer.STICK_COUNT][61 * 3 + 4];
+	static final int[][]												packet		= new int[TestIBMXPlayer.STICK_COUNT][61 * 3 + 4];
 	static private float												playtime	= 0;
 	static protected ConcurrentHashMap<Float, Map<NoteInfo, NoteInfo>>	todispatch	= new ConcurrentHashMap<>();
 
@@ -36,14 +37,21 @@ public class TestIBMXPlayer {
 	static private List<File>											fileList;
 	static int															fileId		= -1;
 	private static IBXMAdvancedLoader									anode;
+	static InetAddress[]												addresses;
 
-	public static void main(final String[] args) throws SocketException {
-		TestIBMXPlayer.colorMap = new Color[] { Color.RED, Color.GREEN, Color.BLUE, Color.MAGENTA, Color.ORANGE, Color.YELLOW };
+	public static void main(final String[] args) throws SocketException, UnknownHostException {
+		TestIBMXPlayer.colorMap = new Color[] { Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE };
 		TestIBMXPlayer.datagramSocket = new DatagramSocket();
 
 		final File[] files = TestIBMXPlayer.folder.listFiles();
 		TestIBMXPlayer.fileList = Arrays.asList(files);
 		Collections.shuffle(TestIBMXPlayer.fileList);
+
+		TestIBMXPlayer.addresses = new InetAddress[TestIBMXPlayer.STICK_COUNT];
+		for (int i = 0; i < TestIBMXPlayer.STICK_COUNT; i++) {
+			TestIBMXPlayer.addresses[i] = InetAddress.getByName(TestIBMXPlayer.TEST_NODE ? "127.0.0.1" : ("192.168.23." + (i + 1)));
+
+		}
 
 		final Scanner cin = new Scanner(System.in);
 		new Thread() {
@@ -66,17 +74,12 @@ public class TestIBMXPlayer {
 			public void run() {
 				TestIBMXPlayer.update();
 			}
-		}, 1000 / 60, 1000 / 60);
+		}, 1000 / 15, 1000 / 15);
 
-		// try {
-		// play("pinball_illusions.mod");
-		// } catch (final Exception e1) {
-		// e1.printStackTrace();
-		// }
 	}
 
 	protected static void update() {
-		TestIBMXPlayer.playtime += 1 / 60f;
+		TestIBMXPlayer.playtime += 1 / 15f;
 		if (TestIBMXPlayer.anode == null || TestIBMXPlayer.anode.isFinsihed()) {
 			TestIBMXPlayer.playRandom();
 		}
@@ -96,26 +99,30 @@ public class TestIBMXPlayer {
 					final Color color = TestIBMXPlayer.colorMap[note.instrumentid % TestIBMXPlayer.colorMap.length];
 					// final int channel = Math.abs(note.instrumentid) % 3;
 					final int ledid = 4 + (10 - Math.abs(note.noteKey + (note.panning / 10)) % 10) * 3;
-					float ncolor = (note.volume / 64f * note.globalVolume / 64f);
-					if (ncolor > 1) {
-						ncolor = 1;
+					short ncolor = (short) ((note.volume / 64f * note.globalVolume / 64f) * 125);
+					if (ncolor > 125) {
+						ncolor = 125;
 					}
 
 					for (int x = 0; x < 60 * 3; x += 30) {
-						if (((TestIBMXPlayer.packet[stickid][ledid + x]) + ncolor * color.getRed() > 1)) {
-							TestIBMXPlayer.packet[stickid][ledid + x] = 1;
+						final int newValueR = (TestIBMXPlayer.packet[stickid][ledid + x] + ncolor * (color.getRed() / 2));
+						final int newValueG = (TestIBMXPlayer.packet[stickid][ledid + x + 1] + ncolor * (color.getGreen() / 2));
+						final int newValueB = (TestIBMXPlayer.packet[stickid][ledid + x + 2] + ncolor * (color.getBlue() / 2));
+
+						if (newValueR > 125) {
+							TestIBMXPlayer.packet[stickid][ledid + x] = 125;
 						} else {
-							TestIBMXPlayer.packet[stickid][ledid + x] += ncolor * color.getRed();
+							TestIBMXPlayer.packet[stickid][ledid + x] = newValueR;
 						}
-						if (((TestIBMXPlayer.packet[stickid][ledid + 1 + x]) + ncolor * color.getGreen() > 1)) {
-							TestIBMXPlayer.packet[stickid][ledid + 1 + x] = 1;
+						if (newValueG > 125) {
+							TestIBMXPlayer.packet[stickid][ledid + 1 + x] = 125;
 						} else {
-							TestIBMXPlayer.packet[stickid][ledid + 1 + x] += ncolor * color.getGreen();
+							TestIBMXPlayer.packet[stickid][ledid + 1 + x] = newValueG;
 						}
-						if (((TestIBMXPlayer.packet[stickid][ledid + 2 + x]) + ncolor * color.getBlue() > 1)) {
-							TestIBMXPlayer.packet[stickid][ledid + 2 + x] = 1;
+						if (newValueB > 125) {
+							TestIBMXPlayer.packet[stickid][ledid + 2 + x] = 125;
 						} else {
-							TestIBMXPlayer.packet[stickid][ledid + 2 + x] += ncolor * color.getBlue();
+							TestIBMXPlayer.packet[stickid][ledid + 2 + x] = newValueB;
 						}
 					}
 				}
@@ -127,9 +134,9 @@ public class TestIBMXPlayer {
 		}
 
 		for (int stickid = 0; stickid < TestIBMXPlayer.STICK_COUNT; stickid++) {
-			TestIBMXPlayer.packet[stickid][0] = (stickid + 1);
+			TestIBMXPlayer.packet[stickid][0] = (byte) (stickid + 1);
 			try {
-				final InetAddress address = InetAddress.getByName(TestIBMXPlayer.TEST_NODE ? "127.0.0.1" : ("192.168.23." + (stickid + 1)));
+
 				final byte[] data = new byte[TestIBMXPlayer.packet[stickid].length];
 				TestIBMXPlayer.copy(stickid, data);
 
@@ -138,14 +145,14 @@ public class TestIBMXPlayer {
 				data[1] = 0;
 				data[2] = 0;
 				data[3] = 0;
-				final DatagramPacket pp = new DatagramPacket(data, data.length, address, 2342);
+				final DatagramPacket pp = new DatagramPacket(data, data.length, TestIBMXPlayer.addresses[stickid], 2342);
 				TestIBMXPlayer.datagramSocket.send(pp);
 			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 			for (int i = 4; i < TestIBMXPlayer.packet[stickid].length; i++) {
-				if (TestIBMXPlayer.packet[stickid][i] > 0.05f) {
-					TestIBMXPlayer.packet[stickid][i] -= 0.05f;
+				if (TestIBMXPlayer.packet[stickid][i] > 30) {
+					TestIBMXPlayer.packet[stickid][i] -= 30;
 				} else {
 					TestIBMXPlayer.packet[stickid][i] = 0;
 				}
@@ -191,7 +198,8 @@ public class TestIBMXPlayer {
 
 	static private void copy(final int stickid, final byte[] data) {
 		for (int i = 4; i < data.length; i++) {
-			data[i] = (byte) (TestIBMXPlayer.packet[stickid][i] * 255);
+			final int value = (TestIBMXPlayer.packet[stickid][i] * 2);
+			data[i] = (byte) (value);
 		}
 	}
 

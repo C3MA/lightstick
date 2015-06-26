@@ -26,6 +26,8 @@ public class IBXM {
 
 	private Map<Integer, Integer>	lastKey				= new HashMap<>();
 
+	private boolean					isEnd;
+
 	/* Play the specified Module at the specified sampling rate. */
 	public IBXM(final Module module, final int samplingRate) {
 		this.module = module;
@@ -172,8 +174,12 @@ public class IBXM {
 		}
 		this.downsample(outputBuf, tickLen + 64);
 		this.volumeRamp(outputBuf, tickLen);
-		this.tick();
+		this.isEnd = this.tick();
 		return tickLen;
+	}
+
+	public boolean isEnd() {
+		return this.isEnd;
 	}
 
 	private int calculateTickLen(final int tempo, final int samplingRate) {
@@ -325,7 +331,7 @@ public class IBXM {
 		return songEnd;
 	}
 
-	public void onChannelnote(final int id, final int noteVol, final int noteKey, final int globalValume, final Instrument instrument, final int panning, int freq) {
+	public void onChannelnote(final int id, final int noteVol, final int noteKey, final int globalValume, final Instrument instrument, final int panning, final int freq) {
 		this.lastKey.put(id, noteKey);
 		int instrumentId = 0;
 		if (this.instrumentLookup != null) {
