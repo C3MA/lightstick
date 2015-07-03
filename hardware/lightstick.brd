@@ -79,7 +79,7 @@
 <hole x="6" y="30.5" drill="3.2"/>
 <hole x="46" y="30.5" drill="3.2"/>
 <hole x="46" y="4.5" drill="3.2"/>
-<text x="9.3" y="2.1" size="1.27" layer="1" font="vector" ratio="15">C3MA Lightstick 20150412</text>
+<text x="9.3" y="2.1" size="1.27" layer="1" font="vector" ratio="15">C3MA Lightstick 20150703</text>
 </plain>
 <libraries>
 <library name="pinhead">
