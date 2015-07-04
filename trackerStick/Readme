@@ -1,4 +1,0 @@
-Ansteuerung der Sticks via Xm,Mod oder S3m files
--> instrumente + noten + volume wird auf farbe stickid helligkeit gemappt.
--> grobe approximative synchronisation via offset zwischen sound und audio möglich über 
-Feld playtime +- X initialer wert in sekunden
