@@ -48,9 +48,14 @@ public class TestIBMXPlayer {
 		Collections.shuffle(TestIBMXPlayer.fileList);
 
 		TestIBMXPlayer.addresses = new InetAddress[TestIBMXPlayer.STICK_COUNT];
-		for (int i = 0; i < TestIBMXPlayer.STICK_COUNT; i++) {
-			TestIBMXPlayer.addresses[i] = InetAddress.getByName(TestIBMXPlayer.TEST_NODE ? "127.0.0.1" : ("192.168.23." + (i + 1)));
+		TestIBMXPlayer.configureStickIPs(TestIBMXPlayer.addresses);
 
+		for (int stickid = 0; stickid < TestIBMXPlayer.STICK_COUNT; stickid++) {
+			System.out.println(stickid + "-> " + TestIBMXPlayer.addresses[stickid]);
+			if (TestIBMXPlayer.addresses[stickid] == null) {
+				System.out.println("Missing adress");
+				return;
+			}
 		}
 
 		final Scanner cin = new Scanner(System.in);
@@ -78,6 +83,12 @@ public class TestIBMXPlayer {
 
 	}
 
+	private static void configureStickIPs(final InetAddress[] addresses2) throws UnknownHostException {
+		addresses2[0] = InetAddress.getByName("192.168.1.3");
+		addresses2[1] = InetAddress.getByName("192.168.1.1");
+		addresses2[2] = InetAddress.getByName("192.168.1.2");
+	}
+
 	protected static void update() {
 		TestIBMXPlayer.playtime += 1 / 15f;
 		if (TestIBMXPlayer.anode == null || TestIBMXPlayer.anode.isFinsihed()) {
@@ -98,13 +109,13 @@ public class TestIBMXPlayer {
 					final int stickid = Math.abs(note.id) % TestIBMXPlayer.STICK_COUNT;
 					final Color color = TestIBMXPlayer.colorMap[note.instrumentid % TestIBMXPlayer.colorMap.length];
 					// final int channel = Math.abs(note.instrumentid) % 3;
-					final int ledid = 4 + (10 - Math.abs(note.noteKey + (note.panning / 10)) % 10) * 3;
+					final int ledid = 4 + (Math.abs(note.noteKey + (note.panning / 15)) % 15) * 3;
 					short ncolor = (short) ((note.volume / 64f * note.globalVolume / 64f) * 125);
 					if (ncolor > 125) {
 						ncolor = 125;
 					}
 
-					for (int x = 0; x < 60 * 3; x += 30) {
+					for (int x = 0; x < 60 * 3; x += 45) {
 						final int newValueR = (TestIBMXPlayer.packet[stickid][ledid + x] + ncolor * (color.getRed() / 2));
 						final int newValueG = (TestIBMXPlayer.packet[stickid][ledid + x + 1] + ncolor * (color.getGreen() / 2));
 						final int newValueB = (TestIBMXPlayer.packet[stickid][ledid + x + 2] + ncolor * (color.getBlue() / 2));
@@ -134,6 +145,7 @@ public class TestIBMXPlayer {
 		}
 
 		for (int stickid = 0; stickid < TestIBMXPlayer.STICK_COUNT; stickid++) {
+
 			TestIBMXPlayer.packet[stickid][0] = (byte) (stickid + 1);
 			try {
 
