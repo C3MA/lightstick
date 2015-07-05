@@ -45,11 +45,11 @@ public class NoiseTest extends JFrame implements Runnable {
     private float offsetY = 23f;
     private float osX = 0.00001f;
     private float osY = 0.00001f;
-    private long sleep = 83; 
+    private long sleep = 100; 
     private TextureImage texture;
     private Texture texturePattern;
-    private long timeToRun;
-    private int fps;
+    private long timeToRun ;
+    private int fps = 60;
 	private Dynamic dynamic;
 
     /**
@@ -116,7 +116,7 @@ public class NoiseTest extends JFrame implements Runnable {
         long starttime = new Date().getTime();
         
         while (true) {
-            System.gc();
+            //FIXME System.gc();
             texture.renderAndWait(texturePattern);
 
             image = texture.getImage();
@@ -126,7 +126,7 @@ public class NoiseTest extends JFrame implements Runnable {
             ((TestTexture) texturePattern).offsetV += 0.003 * Math.cos( fooY + PerlinNoise.noise(fooY / 2, fooY, 5));
             fooX += osX;
             fooX += osX;
-            //System.out.println("x: " + ((TestTexture) texturePattern).offsetU + "; y: " + ((TestTexture) texturePattern).offsetV );
+            System.out.println("x: " + ((TestTexture) texturePattern).offsetU + "; y: " + ((TestTexture) texturePattern).offsetV );
             
 
             this.repaint();
@@ -150,12 +150,16 @@ public class NoiseTest extends JFrame implements Runnable {
             } catch (InterruptedException ex) {
                 Logger.getLogger(NoiseTest.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            /* if requested stopp, after a certain time */
             if (timeToRun > 0) {
                 if ((starttime + timeToRun) < new Date().getTime()) {
                     break;
                 }
             }
         }
+        System.out.println("Finished!");
+        
 
         System.exit(0);
     }
