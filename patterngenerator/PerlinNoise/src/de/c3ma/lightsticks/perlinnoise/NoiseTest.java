@@ -116,7 +116,7 @@ public class NoiseTest extends JFrame implements Runnable {
         long starttime = new Date().getTime();
         
         while (true) {
-            //FIXME System.gc();
+            System.gc();
             texture.renderAndWait(texturePattern);
 
             image = texture.getImage();
