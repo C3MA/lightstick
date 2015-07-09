@@ -16,3 +16,5 @@
  -x (--offsetx) N   : x start postition.
  -y (--offsety) N   : y start position
 
+== Dependencies ==
+Based on JTexgen: http://sourceforge.net/projects/jtexgen
