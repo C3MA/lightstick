@@ -104,20 +104,12 @@ public final class CommandLineValues {
     
     @Option(name = "-v", aliases = {"--osy"}, required = false,
             usage = "y oscilator")
-    private float osY = 0.0002f;
+    private float osY = 0.002f;
     
     @Option(name = "-s", aliases = {"--sleep"}, required = false,
             usage = "sleep time between frames")
-    private long sleep = 83; 
-    
-    @Option(name = "-f", aliases = {"--fps"}, required = false,
-            usage = "frames per second for in seqence file")
-    private int fps = 12; 
-
-    public int getFps() {
-        return fps;
-    }
-    
+    private long sleep = 100; 
+        
     @Option(name = "-?", aliases = {"--help"}, required = false,
             usage = "print usage")
     private boolean help;

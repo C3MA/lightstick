@@ -4,18 +4,15 @@
  */
 package de.c3ma.lightsticks.perlinnoise;
 
-import java.awt.Color;
 import java.awt.Graphics;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
-
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.texgen.gui.TextureImage;
@@ -37,19 +34,16 @@ public class NoiseTest extends JFrame implements Runnable {
 	private static final long serialVersionUID = -3503501169676229128L;
 	
 	private BufferedImage image;
-    private int width = 20;
-    private int height = 20;
-    private float dimm = 1f;
-    //private float step = 0.01f;
-    private float offsetX = 42f;
-    private float offsetY = 23f;
-    private float osX = 0.00001f;
-    private float osY = 0.00001f;
-    private long sleep = 100; 
+    private int width;
+    private int height;
+    private float dimm;
+    private float offsetX;
+    private float offsetY;
+    private float osX;
+    private long sleep; 
     private TextureImage texture;
     private Texture texturePattern;
     private long timeToRun ;
-    private int fps = 60;
 	private Dynamic dynamic;
 
     /**
@@ -82,9 +76,7 @@ public class NoiseTest extends JFrame implements Runnable {
         offsetX = values.getOffsetX();
         offsetY = values.getOffsetY();
         osX = values.getOsX();
-        osY = values.getOsY();
         sleep = values.getSleep(); 
-        fps = values.getFps();
 
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         texture = new TextureImage(width, height);
@@ -117,7 +109,8 @@ public class NoiseTest extends JFrame implements Runnable {
         
         while (true) {
             System.gc();
-            texture.renderAndWait(texturePattern);
+            //texture.renderAndWait(texturePattern);
+            texture.run(texturePattern);
 
             image = texture.getImage();
 
@@ -125,7 +118,7 @@ public class NoiseTest extends JFrame implements Runnable {
             ((TestTexture) texturePattern).offsetU += 0.003 * Math.sin(fooX + PerlinNoise.noise(fooX, fooX / 2, 3.0));
             ((TestTexture) texturePattern).offsetV += 0.003 * Math.cos( fooY + PerlinNoise.noise(fooY / 2, fooY, 5));
             fooX += osX;
-            fooX += osX;
+            fooY += osX;
             System.out.println("x: " + ((TestTexture) texturePattern).offsetU + "; y: " + ((TestTexture) texturePattern).offsetV );
             
 
