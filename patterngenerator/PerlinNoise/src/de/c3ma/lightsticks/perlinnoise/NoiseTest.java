@@ -4,15 +4,18 @@
  */
 package de.c3ma.lightsticks.perlinnoise;
 
+import java.awt.Color;
 import java.awt.Graphics;
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
+
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.texgen.gui.TextureImage;
@@ -87,7 +90,7 @@ public class NoiseTest extends JFrame implements Runnable {
         ((TestTexture) texturePattern).offsetV = offsetY;
 
         if (values.getRemoteAddress() != null) {
-            dynamic = new Dynamic(values.getRemoteAddress());
+            dynamic = new Dynamic(values.getRemoteAddress(), width, height);
         }
 
         new Thread(this).start();
@@ -124,17 +127,17 @@ public class NoiseTest extends JFrame implements Runnable {
 
             this.repaint();
 
-            /*if (s != null) {
-                Frame f = new Frame(width, height);
-                for(int y = 0; y < height; y++) {
+            if (dynamic != null) {
+            	
+            	for(int y = 0; y < height; y++) {
                     for(int x = 0; x < width; x++) { 
                         Color c = new Color(image.getRGB(x, y));
-                        f.updatePixel(c.getRed(), c.getGreen(), c.getBlue(), x, y);
+                        dynamic.updatePixel(c.getRed(), c.getGreen(), c.getBlue(), x, y);
                     }
                 }
-                s.addFrame(f);
+            	dynamic.sendImage();
             }
-            */
+            
             try {
                 if (sleep > 0)
                 {
