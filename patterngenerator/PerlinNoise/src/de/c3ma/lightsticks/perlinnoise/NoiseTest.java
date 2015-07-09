@@ -60,7 +60,7 @@ public class NoiseTest extends JFrame implements Runnable {
         }
 
         JFrame frame = new NoiseTest(values);
-        frame.setSize(600, 500);
+        frame.setSize(600, 800);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         if (values.hasGui()) {
             frame.setVisible(true);
@@ -97,7 +97,7 @@ public class NoiseTest extends JFrame implements Runnable {
     public void paint(Graphics g) {
         super.paint(g);
         g.drawImage(image,
-                10, 30, 480, 400,
+                10, 30, 480, 770,
                 0, 0, width, height,
                 this);
     }
@@ -115,11 +115,11 @@ public class NoiseTest extends JFrame implements Runnable {
             image = texture.getImage();
 
 
-            ((TestTexture) texturePattern).offsetU += 0.003 * Math.sin(fooX + PerlinNoise.noise(fooX, fooX / 2, 3.0));
-            ((TestTexture) texturePattern).offsetV += 0.003 * Math.cos( fooY + PerlinNoise.noise(fooY / 2, fooY, 5));
+            ((TestTexture) texturePattern).offsetU += 0.01 * Math.sin(fooX + PerlinNoise.noise(fooX, fooX / 2, 3.0));
+            ((TestTexture) texturePattern).offsetV += 0.01 * Math.cos( fooY + PerlinNoise.noise(fooY / 2, fooY, 5));
             fooX += osX;
             fooY += osX;
-            System.out.println("x: " + ((TestTexture) texturePattern).offsetU + "; y: " + ((TestTexture) texturePattern).offsetV );
+            //System.out.println("x: " + ((TestTexture) texturePattern).offsetU + "; y: " + ((TestTexture) texturePattern).offsetV );
             
 
             this.repaint();

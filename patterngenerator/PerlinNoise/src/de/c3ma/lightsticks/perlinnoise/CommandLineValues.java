@@ -55,15 +55,15 @@ public final class CommandLineValues {
     }
     
     @Option(name = "-h", aliases = {"--height"}, required = false,
-            usage = "height in pixels. Default is 12 ppixels.")
-    private int height = 12;
+            usage = "height in pixels. Default is 12 pixels.")
+    private int height = 60;
 
     public int getHeight() {
         return height;
     }
     
     @Option(name = "-w", aliases = {"--width"}, required = false,
-            usage = "width in pixels. Default is 10 ppixels.")
+            usage = "width in pixels. Default is 10 pixels.")
     private int width = 10;
 
     public int getWidth() {
