@@ -34,7 +34,7 @@ public class IBXMAdvancedLoader {
 		try {
 			this.module = new Module(inputStream);
 			final IBXM ibxm = new IBXM(this.module, IBXMAdvancedLoader.SAMPLE_RATE);
-			ibxm.setInterpolation(Channel.SINC);
+			ibxm.setInterpolation(Channel.NEAREST);
 			this.duration = ibxm.calculateSongDuration();
 			final String songName = this.module.songName.trim();
 			System.out.println("Loading " + songName);

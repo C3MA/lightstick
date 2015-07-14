@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,38 +27,53 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TestIBMXPlayer {
-	static File															folder		= new File("./music");
-	private static boolean												TEST_NODE	= false;
-	static final int[][]												packet		= new int[TestIBMXPlayer.STICK_COUNT][61 * 3 + 4];
-	static private float												playtime	= 0;
-	static protected ConcurrentHashMap<Float, Map<NoteInfo, NoteInfo>>	todispatch	= new ConcurrentHashMap<>();
+	static File															folder			= new File("./music");
+	private static boolean												TEST_NODE		= false;
+	static int[][]														packet;
+	static private float												playtime		= 0;
+	static protected ConcurrentHashMap<Float, Map<NoteInfo, NoteInfo>>	todispatch		= new ConcurrentHashMap<>();
 
-	final static int													STICK_COUNT	= 3;
+	static int															STICK_COUNT		= 0;
 
 	private static Color[]												colorMap;
 	static DatagramSocket												datagramSocket;
 	static private List<File>											fileList;
-	static int															fileId		= -1;
+	static int															fileId			= -1;
 	private static IBXMAdvancedLoader									anode;
-	static InetAddress[]												addresses;
+	static Map<Integer, InetAddress>									addressesmap	= new HashMap<Integer, InetAddress>();
 
 	public static void main(final String[] args) throws SocketException, UnknownHostException {
 		TestIBMXPlayer.colorMap = new Color[] { Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE };
 		TestIBMXPlayer.datagramSocket = new DatagramSocket();
 
+		for (int i = 1; i < 100; i++) {
+			if (i % 10 == 0) {
+				System.out.println("Scanning for sticks " + (i) + "%");
+			}
+			try {
+				final InetAddress address = InetAddress.getByName("192.168.1." + i);
+				final Socket tester = new Socket();
+				final InetSocketAddress inetadd = new InetSocketAddress(address, 2323);
+				tester.connect(inetadd, 200);
+				final boolean connected = tester.getInputStream().read() > 0;
+				if (connected) {
+					TestIBMXPlayer.addressesmap.put(TestIBMXPlayer.STICK_COUNT, address);
+					System.out.println(TestIBMXPlayer.STICK_COUNT + "->" + "192.168.1." + i);
+					TestIBMXPlayer.STICK_COUNT++;
+				}
+			} catch (final Exception e) {
+			}
+		}
+		System.out.println("Detected " + (TestIBMXPlayer.STICK_COUNT + 1) + " sticks");
+		TestIBMXPlayer.packet = new int[TestIBMXPlayer.STICK_COUNT][61 * 3 + 4];
+
 		final File[] files = TestIBMXPlayer.folder.listFiles();
 		TestIBMXPlayer.fileList = Arrays.asList(files);
 		Collections.shuffle(TestIBMXPlayer.fileList);
-
-		TestIBMXPlayer.addresses = new InetAddress[TestIBMXPlayer.STICK_COUNT];
-		TestIBMXPlayer.configureStickIPs(TestIBMXPlayer.addresses);
+		System.out.println("Using " + TestIBMXPlayer.fileList.size() + " trackerfiles");
 
 		for (int stickid = 0; stickid < TestIBMXPlayer.STICK_COUNT; stickid++) {
-			System.out.println(stickid + "-> " + TestIBMXPlayer.addresses[stickid]);
-			if (TestIBMXPlayer.addresses[stickid] == null) {
-				System.out.println("Missing adress");
-				return;
-			}
+			System.out.println(stickid + "-> " + TestIBMXPlayer.addressesmap.get(stickid));
 		}
 
 		final Scanner cin = new Scanner(System.in);
@@ -81,12 +99,6 @@ public class TestIBMXPlayer {
 			}
 		}, 1000 / 15, 1000 / 15);
 
-	}
-
-	private static void configureStickIPs(final InetAddress[] addresses2) throws UnknownHostException {
-		addresses2[0] = InetAddress.getByName("192.168.1.3");
-		addresses2[1] = InetAddress.getByName("192.168.1.1");
-		addresses2[2] = InetAddress.getByName("192.168.1.2");
 	}
 
 	protected static void update() {
@@ -157,7 +169,7 @@ public class TestIBMXPlayer {
 				data[1] = 0;
 				data[2] = 0;
 				data[3] = 0;
-				final DatagramPacket pp = new DatagramPacket(data, data.length, TestIBMXPlayer.addresses[stickid], 2342);
+				final DatagramPacket pp = new DatagramPacket(data, data.length, TestIBMXPlayer.addressesmap.get(stickid), 2342);
 				TestIBMXPlayer.datagramSocket.send(pp);
 			} catch (final IOException e) {
 				e.printStackTrace();
