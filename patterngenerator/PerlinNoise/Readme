@@ -4,17 +4,19 @@
 
 == Usage ==
  -? (--help)        : print usage
- -d (--dimm) N      : dimm value 0.00 - 1.00. Default is 1.00
  -g (--gui)         : should the applicatin starts with gui
  -h (--height) N    : height in pixels. Default is 12 ppixels.
  -r (--remote) VAL  : ip address or hostname of the lightstick emulator
  -s (--sleep) N     : sleep time between frames
- -t (--time) N      : time to run in miliseconds. 0 or default is inity
  -u (--osx) N       : x oscilator
  -v (--osy) N       : y oscilator
  -w (--width) N     : width in pixels. Default is 10 ppixels.
  -x (--offsetx) N   : x start postition.
  -y (--offsety) N   : y start position
+
+== Example ==
+=== Run against the 'emulator' ===
+-r 127.0.0.1
 
 == Dependencies ==
 Based on JTexgen: http://sourceforge.net/projects/jtexgen

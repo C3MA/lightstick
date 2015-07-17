@@ -132,10 +132,14 @@ public class NoiseTest extends JFrame implements Runnable {
             	for(int y = 0; y < height; y++) {
                     for(int x = 0; x < width; x++) { 
                         Color c = new Color(image.getRGB(x, y));
-                        dynamic.updatePixel(c.getRed(), c.getGreen(), c.getBlue(), x, y);
+                        dynamic.updatePixel((byte) c.getRed(), (byte) c.getGreen(), (byte) c.getBlue(), x, y);
                     }
                 }
-            	dynamic.sendImage();
+            	try {
+					dynamic.sendImage();
+				} catch (IOException e) {
+					Logger.getLogger(NoiseTest.class.getName()).log(Level.SEVERE, "Communication Error", e.getMessage());
+				}
             }
             
             try {
