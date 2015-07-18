@@ -1,4 +1,4 @@
-print("Booting... Lightstick v0.50")
+print("Booting... Lightstick v0.51")
 wifi.setmode(wifi.STATION)
 wifi.sta.config("sticknet","stickpw1")
 
@@ -62,7 +62,7 @@ tmr.alarm(1, 200, 1, function()
       lastIP=lastIP-tenth*10
       ones=lastIP
       -- Set some orange points, soo the IP address is not coded in the foot, afterwards the IP is displayed
-      ws2812.writergb(4, string.char(255, 165, 0):rep(10) .. string.char(30, 0, 0):rep(hundred) .. string.char(0,30,0):rep(tenth) .. string.char(0,0,30):rep(ones) )
+      ws2812.writergb(4, string.char(128, 82, 0):rep(10) .. string.char(30, 0, 0):rep(hundred) .. string.char(0,30,0):rep(tenth) .. string.char(0,0,30):rep(ones) )
 
       startUDPServer()
       startTelnetServer()
