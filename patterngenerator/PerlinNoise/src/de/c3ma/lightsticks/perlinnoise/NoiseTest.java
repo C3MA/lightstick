@@ -49,6 +49,8 @@ public class NoiseTest extends JFrame implements Runnable {
     private long timeToRun ;
 	private Dynamic dynamic;
 
+	private boolean mHasGUI = false;
+
     /**
      * @param args the command line arguments
      */
@@ -62,10 +64,12 @@ public class NoiseTest extends JFrame implements Runnable {
             System.exit(1);
         }
 
-        JFrame frame = new NoiseTest(values);
+        NoiseTest frame = new NoiseTest(values);
+        frame.mHasGUI = values.hasGui();
         frame.setSize(600, 800);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        if (values.hasGui()) {
+        
+        if (frame.mHasGUI) {
             frame.setVisible(true);
         }
 
@@ -91,6 +95,7 @@ public class NoiseTest extends JFrame implements Runnable {
 
         if (values.getRemoteAddress() != null) {
             dynamic = new Dynamic(values.getRemoteAddress(), width, height);
+            System.out.println("Generate content with " + width + "x" + height + " pixels, or for " + width + " lightsticks.");
         }
 
         new Thread(this).start();
@@ -99,10 +104,14 @@ public class NoiseTest extends JFrame implements Runnable {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g.drawImage(image,
+        /* only draw something, if necessary */
+        if (this.mHasGUI)
+        {
+        	g.drawImage(image,
                 10, 30, 480, 770,
                 0, 0, width, height,
                 this);
+        }
     }
 
     @Override
