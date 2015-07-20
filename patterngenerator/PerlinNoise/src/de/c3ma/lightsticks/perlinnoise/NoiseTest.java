@@ -78,7 +78,6 @@ public class NoiseTest extends JFrame implements Runnable {
     public NoiseTest(CommandLineValues values) throws UnknownHostException, IOException {
         width = values.getWidth();
         height = values.getHeight();
-        timeToRun = values.getTime();
         dimm = (float) values.getDimm();
         offsetX = values.getOffsetX();
         offsetY = values.getOffsetY();
