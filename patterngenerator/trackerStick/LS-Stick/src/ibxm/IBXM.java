@@ -191,7 +191,7 @@ public class IBXM {
 		for (int idx = 0, a1 = 0; a1 < 256; idx += 2, a1 += rampRate) {
 			final int a2 = 256 - a1;
 			mixBuf[idx] = (mixBuf[idx] * a1 + this.rampBuf[idx] * a2) >> 8;
-		mixBuf[idx + 1] = (mixBuf[idx + 1] * a1 + this.rampBuf[idx + 1] * a2) >> 8;
+			mixBuf[idx + 1] = (mixBuf[idx + 1] * a1 + this.rampBuf[idx + 1] * a2) >> 8;
 		}
 		System.arraycopy(mixBuf, tickLen * 2, this.rampBuf, 0, 128);
 	}
@@ -351,6 +351,10 @@ public class IBXM {
 
 	public void removeNoteListener(final INoteListener notelistener) {
 		this.noteListeners.remove(notelistener);
+	}
+
+	public int determineTrackCount() {
+		return this.module.numChannels;
 	}
 
 }

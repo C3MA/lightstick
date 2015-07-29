@@ -41,12 +41,13 @@ public class TestIBMXPlayer {
 	static int															fileId			= -1;
 	private static IBXMAdvancedLoader									anode;
 	static Map<Integer, InetAddress>									addressesmap	= new HashMap<Integer, InetAddress>();
+	private static int													tracks			= 1;
 
 	public static void main(final String[] args) throws SocketException, UnknownHostException {
 		TestIBMXPlayer.colorMap = new Color[] { Color.RED, Color.GREEN, Color.BLUE, Color.ORANGE };
 		TestIBMXPlayer.datagramSocket = new DatagramSocket();
 
-		for (int i = 1; i < 100; i++) {
+		for (int i = 1; i < 50; i++) {
 			if (i % 10 == 0) {
 				System.out.println("Scanning for sticks " + (i) + "%");
 			}
@@ -54,7 +55,7 @@ public class TestIBMXPlayer {
 				final InetAddress address = InetAddress.getByName("192.168.1." + i);
 				final Socket tester = new Socket();
 				final InetSocketAddress inetadd = new InetSocketAddress(address, 2323);
-				tester.connect(inetadd, 200);
+				tester.connect(inetadd, 1000);
 				final boolean connected = tester.getInputStream().read() > 0;
 				if (connected) {
 					TestIBMXPlayer.addressesmap.put(TestIBMXPlayer.STICK_COUNT, address);
@@ -161,8 +162,9 @@ public class TestIBMXPlayer {
 			TestIBMXPlayer.packet[stickid][0] = (byte) (stickid + 1);
 			try {
 
+				final int sstick = stickid % TestIBMXPlayer.tracks;
 				final byte[] data = new byte[TestIBMXPlayer.packet[stickid].length];
-				TestIBMXPlayer.copy(stickid, data);
+				TestIBMXPlayer.copy(sstick, data);
 
 				// dont copy the metadata!
 				data[0] = (byte) TestIBMXPlayer.packet[stickid][0];
@@ -215,6 +217,8 @@ public class TestIBMXPlayer {
 					notelist.put(vv, vv);
 				}
 			});
+			TestIBMXPlayer.tracks = TestIBMXPlayer.anode.determineTracks();
+			System.out.println("Trackcount is " + TestIBMXPlayer.tracks);
 		} catch (final IOException e) {
 			e.printStackTrace();
 		}
