@@ -9,12 +9,17 @@ It can be flashed on Linux hosts with the following commands.
 cd os
 ./flash.sh
 ```
-The ESP must be jumpered for the bootloader and had a power cycle.
+The ESP must be jumpered for the bootloader and had a power cycle:
+GPIO0 pulled to GND
+GPIO2 pulled to VCC(3.3V)
 The serial connection between the ESP and the host is done with an USB-UART converter -> **ttyUSB0** is used in flash.sh
 
 ## Initialization (Logic)
 
-After the OS has been flashed (and the Jumper is back in normal mode). The logic itself can be flashed.
+After the OS has been flashed and the jumper is back in normal mode:
+GPIO0 jumpered to VCC(3.3V)
+GPIO2 open (LEDs can be connected there)
+The logic itself can be flashed.
 The initial flashing must be done via serial
 ```
 cd  init-lua/
