@@ -118,4 +118,8 @@ public class IBXMAdvancedLoader {
 	public boolean isFinsihed() {
 		return !this.playing;
 	}
+
+	public int determineTracks() {
+		return this.ibxm.determineTrackCount();
+	}
 }
