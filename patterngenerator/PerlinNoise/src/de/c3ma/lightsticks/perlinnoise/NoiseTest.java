@@ -120,9 +120,9 @@ public class NoiseTest extends JFrame implements Runnable {
         
         while (true) {
             System.gc();
-            //texture.renderAndWait(texturePattern);
-            texture.run(texturePattern);
-
+            texture.renderAndWait(texturePattern);
+            //texture.run(texturePattern);
+            System.out.println(".");
             image = texture.getImage();
 
 
