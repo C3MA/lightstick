@@ -154,7 +154,9 @@ parser.add_argument('--simulator', help='IP address of an the simulator; e.g. --
 args = parser.parse_args(namespace=CmdInput)
 # run
 heightfactor = 5
-w1 = Wall(1,51, CmdInput.simulator)
+stickCount = 50
+
+w1 = Wall(1,stickCount + 1, CmdInput.simulator)
 w1.clear()
 w1.setColor(0,20,0)
 if (CmdInput.simulator):
@@ -162,18 +164,44 @@ if (CmdInput.simulator):
 w1.update()
 
 textColor = [0, 0, 60]
-buffer = {}
+
+# prepare text convertion buffer
+textBuffer = list()
 
 for y, line in enumerate(sys.stdin):
     line = line.replace("\r", "") 
     line = line.replace("\n", "") 
     print(line)
+    textBuffer.append([0] * len(line) )
     for i, c in enumerate(line):
+        s = w1.get((stickCount - 1) - i)
         if c != " ":
             for x in range(0, heightfactor):
-                s = w1.get(49 - i)
                 offset = 59 - ((y * heightfactor) + x)
                 s.get(offset).setColor(*textColor)
+                textBuffer[y][i] = 1
+        else:
+            for x in range(0, heightfactor):
+                offset = 59 - ((y * heightfactor) + x)
+                s.get(offset).setColor(*textColor)
+                
+                textBuffer[y][i] = 0
+
+
+# Shrink it baby!
+
+# start with the second column
+for spalte in range(1, len(textBuffer[0])):
+    print "------ Spalte " + str(spalte) + " --------"
+    for zeile in range(0, len(textBuffer)):
+        if textBuffer[zeile][spalte -1] !=  textBuffer[zeile][spalte]:
+            break
+        else:
+            if zeile == (len(textBuffer) - 1):
+                print "Same column found at " + str(spalte) 
+
+for line in textBuffer:
+    print line
 
 w1.update()
 exit()
