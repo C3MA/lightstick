@@ -194,13 +194,15 @@ firstColumn = []
 # Move the first column into the output
 outputBuffer.append([ textBuffer[i][0] for i in range(0, len(textBuffer))])
 
+print outputBuffer
+
 # start with the second column
 for spalte in range(1, len(textBuffer[0])):
     print "------ Spalte " + str(spalte) + " --------"
     for zeile in range(0, len(textBuffer)):
         if textBuffer[zeile][spalte -1] !=  textBuffer[zeile][spalte]:
             # Move the column to the output buffer
-            
+            outputBuffer.append([ textBuffer[i][spalte] for i in range(0, len(textBuffer))])
             break
         else:
             if zeile == (len(textBuffer) - 1):
@@ -209,5 +211,7 @@ for spalte in range(1, len(textBuffer[0])):
 for line in textBuffer:
     print line
 
+for line in outputBuffer:
+    print line
 w1.update()
 exit()
