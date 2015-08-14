@@ -49,37 +49,18 @@ public class TestIBMXPlayer {
 	public static void main(final String[] args) throws SocketException, UnknownHostException {
 		TestIBMXPlayer.datagramSocket = new DatagramSocket();
 
-		int skip = 0;
-		for (int i = 1; i < 50; i++) {
-			if (i % 10 == 0) {
-				System.out.println("Scanning for sticks " + (i) + "%");
-			}
-			try {
-				final InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
-				final Socket tester = new Socket();
-				final InetSocketAddress inetadd = new InetSocketAddress(address, 2323);
-				tester.connect(inetadd, 1500);
-				final boolean connected = tester.getInputStream().read() > 0;
-				System.out.println(connected + " " + inetadd);
-				if (connected) {
-					TestIBMXPlayer.addressesmap.put(TestIBMXPlayer.STICK_COUNT, address);
-					TestIBMXPlayer.STICK_COUNT++;
-				} else {
-					skip++;
-					if (skip > 3) {
-						System.out.println("Finished scanning");
-						break;
-					}
+		while (true) {
+			TestIBMXPlayer.scan();
+			if (TestIBMXPlayer.addressesmap.size() < 30) {
+				try {
+					Thread.sleep(1000);
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
 				}
-			} catch (final Exception e) {
-				skip++;
-				if (skip > 3) {
-					System.out.println("Finished scanning");
-					break;
-				}
+			} else {
+				break;
 			}
 		}
-		System.out.println("Detected " + (TestIBMXPlayer.STICK_COUNT + 1) + " sticks");
 		TestIBMXPlayer.packet = new int[TestIBMXPlayer.STICK_COUNT][61 * 3 + 4];
 
 		final File[] files = TestIBMXPlayer.folder.listFiles();
@@ -114,6 +95,42 @@ public class TestIBMXPlayer {
 			}
 		}, 1000 / 15, 1000 / 15);
 
+	}
+
+	private static void scan() {
+		TestIBMXPlayer.STICK_COUNT = 0;
+		TestIBMXPlayer.addressesmap.clear();
+		int skip = 0;
+		for (int i = 1; i < 250; i++) {
+			if (i % 10 == 0) {
+				System.out.println("Scanning for sticks " + (i) + "%");
+			}
+			try {
+				final InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
+				final Socket tester = new Socket();
+				final InetSocketAddress inetadd = new InetSocketAddress(address, 2323);
+				tester.connect(inetadd, 1500);
+				final boolean connected = tester.getInputStream().read() > 0;
+				System.out.println(connected + " " + inetadd);
+				if (connected) {
+					TestIBMXPlayer.addressesmap.put(TestIBMXPlayer.STICK_COUNT, address);
+					TestIBMXPlayer.STICK_COUNT++;
+				} else {
+					skip++;
+					if (skip > 3) {
+						System.out.println("Finished scanning");
+						break;
+					}
+				}
+			} catch (final Exception e) {
+				skip++;
+				if (skip > 3) {
+					System.out.println("Finished scanning");
+					break;
+				}
+			}
+		}
+		System.out.println("Detected " + (TestIBMXPlayer.STICK_COUNT + 1) + " sticks");
 	}
 
 	protected static void update() {
