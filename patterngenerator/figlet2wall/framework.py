@@ -174,17 +174,9 @@ for y, line in enumerate(sys.stdin):
     print(line)
     textBuffer.append([0] * len(line) )
     for i, c in enumerate(line):
-        s = w1.get((stickCount - 1) - i)
         if c != " ":
-            for x in range(0, heightfactor):
-                offset = 59 - ((y * heightfactor) + x)
-                s.get(offset).setColor(*textColor)
                 textBuffer[y][i] = 1
         else:
-            for x in range(0, heightfactor):
-                offset = 59 - ((y * heightfactor) + x)
-                s.get(offset).setColor(*textColor)
-                
                 textBuffer[y][i] = 0
 
 
@@ -198,20 +190,25 @@ print outputBuffer
 
 # start with the second column
 for spalte in range(1, len(textBuffer[0])):
-    print "------ Spalte " + str(spalte) + " --------"
+ #   print "------ Spalte " + str(spalte) + " --------"
     for zeile in range(0, len(textBuffer)):
         if textBuffer[zeile][spalte -1] !=  textBuffer[zeile][spalte]:
             # Move the column to the output buffer
             outputBuffer.append([ textBuffer[i][spalte] for i in range(0, len(textBuffer))])
             break
-        else:
-            if zeile == (len(textBuffer) - 1):
-                print "Same column found at " + str(spalte) 
+ #       else:
+ #           if zeile == (len(textBuffer) - 1):
+ #               print "Same column found at " + str(spalte) 
 
-for line in textBuffer:
-    print line
+#for line in textBuffer:
+#    print line
 
-for line in outputBuffer:
-    print line
+for columnNo, column in enumerate(outputBuffer):
+    for rowNo, row in enumerate(outputBuffer[columnNo]): 
+        s = w1.get((stickCount - 1) - columnNo)
+        for x in range(0, heightfactor):
+            offset = 59 - ((rowNo * heightfactor) + x)
+            if row == 1:
+                s.get(offset).setColor(*textColor)
 w1.update()
 exit()
