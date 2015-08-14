@@ -37,7 +37,7 @@ class Stick(object):
 
     def update(self):
       if self.__changed:
-        print("Update "+ str(self.__position) + " at " + str(self.__ip))
+        #print("Update "+ str(self.__position) + " at " + str(self.__ip))
         global sock
         message = array('B')
         message.extend(array('B',[self.__position,0,0,0])) #Header
@@ -160,43 +160,20 @@ w1.setColor(0,20,0)
 if (CmdInput.simulator):
     w1.setColor(0,255,0)
 w1.update()
+
+textColor = [0, 0, 60]
+buffer = {}
+
 for y, line in enumerate(sys.stdin):
     line = line.replace("\r", "") 
     line = line.replace("\n", "") 
-#    line = line.strip()
-    if (line != ""):
-        print(line)
-        for i, c in enumerate(line):
-            if c != " ":
-                for x in range(0, heightfactor):
-                    s = w1.get(49 - i)
-                    offset = 59 - ((y * heightfactor) + x)
-                    s.get(offset).setColor(0,0,60)
+    print(line)
+    for i, c in enumerate(line):
+        if c != " ":
+            for x in range(0, heightfactor):
+                s = w1.get(49 - i)
+                offset = 59 - ((y * heightfactor) + x)
+                s.get(offset).setColor(*textColor)
 
 w1.update()
 exit()
-
-colorR=250
-colorB=20
-
-i = 0
-
-w1.drawArrow(0,colorR,0,colorB)
-w1.drawArrow(12,colorR,0,colorB)
-
-w2 = Wall(25,50)
-w2.clear()
-w2.setColor(0,20,0)
-w2.drawArrow(0,colorR,0,colorB)
-w2.drawArrow(12,colorR,0,colorB)
-
-w1.update()
-w2.update()
-while True:
-    time.sleep(0.5)
-    w1.shiftLeft()
-    w1.update()
-    w2.shiftLeft()
-    w2.update()
-    colorR = (colorR + 20) % 250
-    colorB = (colorB + 20) % 250
