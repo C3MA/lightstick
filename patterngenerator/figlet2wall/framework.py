@@ -189,12 +189,18 @@ for y, line in enumerate(sys.stdin):
 
 
 # Shrink it baby!
+outputBuffer = list()
+firstColumn = []
+# Move the first column into the output
+outputBuffer.append([ textBuffer[i][0] for i in range(0, len(textBuffer))])
 
 # start with the second column
 for spalte in range(1, len(textBuffer[0])):
     print "------ Spalte " + str(spalte) + " --------"
     for zeile in range(0, len(textBuffer)):
         if textBuffer[zeile][spalte -1] !=  textBuffer[zeile][spalte]:
+            # Move the column to the output buffer
+            
             break
         else:
             if zeile == (len(textBuffer) - 1):
