@@ -152,12 +152,16 @@ parser = argparse.ArgumentParser(description='Text to Sticks')
 parser.add_argument('--simulator', help='IP address of an the simulator; e.g. --simulator 127.0.0.1')
 parser.add_argument('--textcolor', help='Color of the text, that should be displayed. e.g. "#000080"')
 parser.add_argument('--stickcount', help='Amount of sticks, that are used')
+parser.add_argument('--scroll', help='Amount of seconds to scroll the text; -1 will scroll endlessly')
 
 args = parser.parse_args(namespace=CmdInput)
 # Set the default parameter
 heightfactor = 5
 stickCount = 10
 textColor = [0, 0, 60]
+backgroudColor = [0, 20, 0]
+backgroudColorSimu = [0, 255, 0]
+scrollDelay = 0.5 # in seconds
 
 # Read parameter
 if (CmdInput.stickcount):
@@ -175,10 +179,10 @@ if (CmdInput.textcolor):
 print("Generate Text for Wall with " + str(stickCount))
 w1 = Wall(1,stickCount + 1, CmdInput.simulator)
 w1.clear()
-w1.setColor(0,20,0)
+w1.setColor(*backgroudColor)
 # Hack, to make the background compatible for the simulator
 if (CmdInput.simulator):
-    w1.setColor(0,255,0)
+    w1.setColor(*backgroudColorSimu)
 w1.update()
 
 # prepare text convertion buffer
@@ -218,5 +222,14 @@ for columnNo, column in enumerate(outputBuffer):
             offset = 59 - ((rowNo * heightfactor) + x)
             if row == 1:
                 s.get(offset).setColor(*textColor)
+
 w1.update()
-exit()
+startTime = int(time.time())
+seconds2scroll = 0
+if CmdInput.scroll:
+    seconds2scroll = int(CmdInput.scroll)
+print startTime
+print seconds2scroll
+while (startTime + seconds2scroll > int(time.time())):
+    print(".")
+    time.sleep(scrollDelay)
