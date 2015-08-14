@@ -154,6 +154,7 @@ parser.add_argument('--textcolor', help='Color of the text, that should be displ
 parser.add_argument('--bgcolor', help='Background color')
 parser.add_argument('--stickcount', help='Amount of sticks, that are used')
 parser.add_argument('--scroll', help='Amount of seconds to scroll the text; -1 will scroll endlessly')
+parser.add_argument('--yoffset', help='The amount of pixel as space above the text')
 
 args = parser.parse_args(namespace=CmdInput)
 # Set the default parameter
@@ -162,11 +163,11 @@ stickCount = 10
 textColor = [0, 0, 60]
 backgroundColor = [0, 20, 0]
 scrollDelay = 0.5 # in seconds
+yoffset = 0 # The amount of pixel, that spaces between the text and the top of the sticks
 
 # Read parameter
 if (CmdInput.stickcount):
     stickCount = int(CmdInput.stickcount)
-
 if (CmdInput.textcolor):
     if (len(CmdInput.textcolor) == 7 and CmdInput.textcolor[0] == '#'):
         textColor[0] = int(CmdInput.textcolor[1:3], 16) # Red
@@ -175,7 +176,6 @@ if (CmdInput.textcolor):
     else:
         print("Color must be in the following format: '#RRGGBB' (Red, Green, Blue are defined as hex values)")
         exit(1)
-
 if (CmdInput.bgcolor):
     if (len(CmdInput.bgcolor) == 7 and CmdInput.bgcolor[0] == '#'):
         backgroundColor[0] = int(CmdInput.bgcolor[1:3], 16) # Red
@@ -184,7 +184,8 @@ if (CmdInput.bgcolor):
     else:
         print("Color must be in the following format: '#RRGGBB' (Red, Green, Blue are defined as hex values)")
         exit(1)
-
+if (CmdInput.yoffset):
+    yoffset = int (CmdInput.yoffset)
 
 print("Generate Text for Wall with " + str(stickCount))
 w1 = Wall(1,stickCount + 1, CmdInput.simulator)
@@ -225,7 +226,7 @@ for columnNo, column in enumerate(outputBuffer):
     for rowNo, row in enumerate(outputBuffer[columnNo]): 
         s = w1.get((stickCount - 1) - columnNo)
         for x in range(0, heightfactor):
-            offset = 59 - ((rowNo * heightfactor) + x)
+            offset = 59 - (yoffset + (rowNo * heightfactor) + x)
             if row == 1:
                 s.get(offset).setColor(*textColor)
 w1.update()
@@ -244,7 +245,7 @@ while ((startTime + seconds2scroll > int(time.time())) or (seconds2scroll == -1)
         for rowNo, row in enumerate(outputBuffer[columnNo]): 
             s = w1.get((stickCount - (1 + index)) - columnNo)
             for x in range(0, heightfactor):
-                offset = 59 - ((rowNo * heightfactor) + x)
+                offset = 59 - (yoffset + (rowNo * heightfactor) + x)
                 if row == 1:
                     s.get(offset).setColor(*textColor)
     w1.update()
