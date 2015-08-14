@@ -151,6 +151,7 @@ class CmdInput:
 parser = argparse.ArgumentParser(description='Text to Sticks')
 parser.add_argument('--simulator', help='IP address of an the simulator; e.g. --simulator 127.0.0.1')
 parser.add_argument('--textcolor', help='Color of the text, that should be displayed. e.g. "#000080"')
+parser.add_argument('--bgcolor', help='Background color')
 parser.add_argument('--stickcount', help='Amount of sticks, that are used')
 parser.add_argument('--scroll', help='Amount of seconds to scroll the text; -1 will scroll endlessly')
 
@@ -159,12 +160,8 @@ args = parser.parse_args(namespace=CmdInput)
 heightfactor = 5
 stickCount = 10
 textColor = [0, 0, 60]
-backgroudColor = [0, 20, 0]
-backgroudColorSimu = [0, 255, 0]
+backgroundColor = [0, 20, 0]
 scrollDelay = 0.5 # in seconds
-# Hack, to make the background compatible for the simulator
-if (CmdInput.simulator):
-    backgroudColor = backgroudColorSimu
 
 # Read parameter
 if (CmdInput.stickcount):
@@ -179,10 +176,20 @@ if (CmdInput.textcolor):
         print("Color must be in the following format: '#RRGGBB' (Red, Green, Blue are defined as hex values)")
         exit(1)
 
+if (CmdInput.bgcolor):
+    if (len(CmdInput.bgcolor) == 7 and CmdInput.bgcolor[0] == '#'):
+        backgroundColor[0] = int(CmdInput.bgcolor[1:3], 16) # Red
+        backgroundColor[1] = int(CmdInput.bgcolor[3:5], 16) # Green
+        backgroundColor[2] = int(CmdInput.bgcolor[5:7], 16) # Blue
+    else:
+        print("Color must be in the following format: '#RRGGBB' (Red, Green, Blue are defined as hex values)")
+        exit(1)
+
+
 print("Generate Text for Wall with " + str(stickCount))
 w1 = Wall(1,stickCount + 1, CmdInput.simulator)
 w1.clear()
-w1.setColor(*backgroudColor)
+w1.setColor(*backgroundColor)
 w1.update()
 
 # prepare text convertion buffer
@@ -208,7 +215,6 @@ outputBuffer.append([ textBuffer[i][0] for i in range(0, len(textBuffer))])
 
 # start with the second column
 for spalte in range(1, len(textBuffer[0])):
- #   print "------ Spalte " + str(spalte) + " --------"
     for zeile in range(0, len(textBuffer)):
         if textBuffer[zeile][spalte -1] !=  textBuffer[zeile][spalte]:
             # Move the column to the output buffer
@@ -230,10 +236,10 @@ if CmdInput.scroll:
     seconds2scroll = int(CmdInput.scroll)
 index=0
 while ((startTime + seconds2scroll > int(time.time())) or (seconds2scroll == -1)):
-    print(".")
+    #print(".")
     time.sleep(scrollDelay)
     w1.clear()
-    w1.setColor(*backgroudColor)
+    w1.setColor(*backgroundColor)
     for columnNo, column in enumerate(outputBuffer):
         for rowNo, row in enumerate(outputBuffer[columnNo]): 
             s = w1.get((stickCount - (1 + index)) - columnNo)
@@ -243,6 +249,6 @@ while ((startTime + seconds2scroll > int(time.time())) or (seconds2scroll == -1)
                     s.get(offset).setColor(*textColor)
     w1.update()
     index = index + 1
-    # Reset the count
+    # Reset the count, when the end is reached
     if (index >= stickCount):
         index = 0
