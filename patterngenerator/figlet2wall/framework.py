@@ -150,20 +150,36 @@ class CmdInput:
 
 parser = argparse.ArgumentParser(description='Text to Sticks')
 parser.add_argument('--simulator', help='IP address of an the simulator; e.g. --simulator 127.0.0.1')
+parser.add_argument('--textcolor', help='Color of the text, that should be displayed. e.g. "#000080"')
+parser.add_argument('--stickcount', help='Amount of sticks, that are used')
 
 args = parser.parse_args(namespace=CmdInput)
-# run
+# Set the default parameter
 heightfactor = 5
-stickCount = 50
+stickCount = 10
+textColor = [0, 0, 60]
 
+# Read parameter
+if (CmdInput.stickcount):
+    stickCount = int(CmdInput.stickcount)
+
+if (CmdInput.textcolor):
+    if (len(CmdInput.textcolor) == 7 and CmdInput.textcolor[0] == '#'):
+        textColor[0] = int(CmdInput.textcolor[1:3], 16) # Red
+        textColor[1] = int(CmdInput.textcolor[3:5], 16) # Green
+        textColor[2] = int(CmdInput.textcolor[5:7], 16) # Blue
+    else:
+        print("Color must be in the following format: '#RRGGBB' (Red, Green, Blue are defined as hex values)")
+        exit(1)
+
+print("Generate Text for Wall with " + str(stickCount))
 w1 = Wall(1,stickCount + 1, CmdInput.simulator)
 w1.clear()
 w1.setColor(0,20,0)
+# Hack, to make the background compatible for the simulator
 if (CmdInput.simulator):
     w1.setColor(0,255,0)
 w1.update()
-
-textColor = [0, 0, 60]
 
 # prepare text convertion buffer
 textBuffer = list()
@@ -186,8 +202,6 @@ firstColumn = []
 # Move the first column into the output
 outputBuffer.append([ textBuffer[i][0] for i in range(0, len(textBuffer))])
 
-print outputBuffer
-
 # start with the second column
 for spalte in range(1, len(textBuffer[0])):
  #   print "------ Spalte " + str(spalte) + " --------"
@@ -196,12 +210,6 @@ for spalte in range(1, len(textBuffer[0])):
             # Move the column to the output buffer
             outputBuffer.append([ textBuffer[i][spalte] for i in range(0, len(textBuffer))])
             break
- #       else:
- #           if zeile == (len(textBuffer) - 1):
- #               print "Same column found at " + str(spalte) 
-
-#for line in textBuffer:
-#    print line
 
 for columnNo, column in enumerate(outputBuffer):
     for rowNo, row in enumerate(outputBuffer[columnNo]): 
