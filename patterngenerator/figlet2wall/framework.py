@@ -162,6 +162,9 @@ textColor = [0, 0, 60]
 backgroudColor = [0, 20, 0]
 backgroudColorSimu = [0, 255, 0]
 scrollDelay = 0.5 # in seconds
+# Hack, to make the background compatible for the simulator
+if (CmdInput.simulator):
+    backgroudColor = backgroudColorSimu
 
 # Read parameter
 if (CmdInput.stickcount):
@@ -180,9 +183,6 @@ print("Generate Text for Wall with " + str(stickCount))
 w1 = Wall(1,stickCount + 1, CmdInput.simulator)
 w1.clear()
 w1.setColor(*backgroudColor)
-# Hack, to make the background compatible for the simulator
-if (CmdInput.simulator):
-    w1.setColor(*backgroudColorSimu)
 w1.update()
 
 # prepare text convertion buffer
@@ -222,14 +222,27 @@ for columnNo, column in enumerate(outputBuffer):
             offset = 59 - ((rowNo * heightfactor) + x)
             if row == 1:
                 s.get(offset).setColor(*textColor)
-
 w1.update()
+
 startTime = int(time.time())
 seconds2scroll = 0
 if CmdInput.scroll:
     seconds2scroll = int(CmdInput.scroll)
-print startTime
-print seconds2scroll
-while (startTime + seconds2scroll > int(time.time())):
+index=0
+while ((startTime + seconds2scroll > int(time.time())) or (seconds2scroll == -1)):
     print(".")
     time.sleep(scrollDelay)
+    w1.clear()
+    w1.setColor(*backgroudColor)
+    for columnNo, column in enumerate(outputBuffer):
+        for rowNo, row in enumerate(outputBuffer[columnNo]): 
+            s = w1.get((stickCount - (1 + index)) - columnNo)
+            for x in range(0, heightfactor):
+                offset = 59 - ((rowNo * heightfactor) + x)
+                if row == 1:
+                    s.get(offset).setColor(*textColor)
+    w1.update()
+    index = index + 1
+    # Reset the count
+    if (index >= stickCount):
+        index = 0
