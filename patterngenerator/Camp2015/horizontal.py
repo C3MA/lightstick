@@ -82,7 +82,7 @@ class Lightstick():
 
 def main(argv):
     #w = Wall(50,1)
-    w = Wall(12,26)
+    w = Wall(25,26)
     colorValue = random.random()
     rgb =  colorsys.hsv_to_rgb(colorValue, 1, 0.20)
     color = [int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)]

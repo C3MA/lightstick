@@ -1,142 +1,246 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import socket
-from array import array
 import time
-import sys
-import copy
-import pdb;
-import colorsys
 import random
-
-UDP_PORT = 2342
-
-red=array('B',[75,0,0])
-green=array('B',[0,75,0])
-blue=array('B',[0,0,75])
-space = array('B',[0,0,0])
-
-
-TIME=0.03
-UPDATE_FACTOR=3
-
+from array import array
+import socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+UDP_PORT = 2342
+IP_HOST_BASE = "192.168.23."
+
+FPS=30
+
+class Led(object): 
+
+    def __init__(self, red, blue, green): 
+        self.__red = red 
+        self.__blue = blue 
+        self.__green = green 
+
+    def setColor(self, red, blue, green):
+        self.__red = red 
+        self.__blue = blue 
+        self.__green = green 
+ 
+    def getBytes(self): 
+       return array('B',[self.__red, self.__blue, self.__green]) 
+
+    def setBytes(self,byteArray):
+    	self.setColor(byteArray[0],byteArray[1], byteArray[2])
+
+class Stick(object): 
+
+    def __init__(self, ip, position): 
+        self.__leds = [ Led(0,50,0) for i in range(60)]
+        self.__ip = ip
+        self.__position = position
+        self.__changed = True
+
+    def update(self,force=False):
+      if self.__changed or force:
+        #print("Update "+ self.__ip)
+        global sock
+        message = array('B')
+        message.extend(array('B',[0,0,0,0])) #Header
+        message.extend(self.getBytes())
+        try: 
+            sock.sendto(message, (self.__ip, UDP_PORT))
+            self.__changed = False
+        except socket.error: 
+            print("exception")
+
+    def get(self, pos):
+    	self.__changed = True
+    	return self.__leds[pos]
+
+    def setColor(self, red, green, blue):
+    	for i in range(0, len(self.__leds)):
+    		self.__leds[i].setColor(red,green,blue)
+    	self.__changed = True
+
+    def getBytes(self):
+        bArray = array('B')
+        for l in self.__leds:
+           bArray.extend(l.getBytes())
+        return bArray
+
+    def setBytes(self,byteArray):
+    	#print("Setting "+str(len(byteArray))+" Bytes")
+        for i in range(0,len(byteArray),3):
+        	#print("Led:"+str(i/3)+" Branch "+str(i)+": "+str(byteArray[i])+str(byteArray[i+1])+str(byteArray[i+2]))
+        	self.get(int(i/3)).setColor(byteArray[i],byteArray[i+1], byteArray[i+2])
+        self.__changed = True
+
+    def clear(self):
+    	self.setColor(0,0,0)
+
+    def shiftUp(self):
+    	for i in range(len(self.__leds)-1,0,-1):
+    		fArray = self.get(i).getBytes()
+    		if i+1 < len(self.__leds)-1:
+    			self.get(i+1).setBytes(fArray)
+
+    def shiftDown(self):
+    	for i in range(0, len(self.__leds)):
+    		fArray = self.get(i).getBytes()
+    		if i-1 > 0:
+    			self.get(i-1).setBytes(fArray)
 
 
-class Wall():
-    ipnet = "192.168.23."
-    def __init__(self, stickcount, firstIP="1"):
-        self.sticks = []
-        print("initialise wall object with " + str(stickcount) + " sticks")
-        self.stickcount = stickcount
-        for i in range(0, stickcount):
-            print i
-            self.sticks.insert(i, Lightstick(self.ipnet+str(firstIP+i), 60, 0, 0))
-            self.sticks[i].updateLeds()
 
-    def getIps(self):
-        for stick in self.sticks:
-            print(stick.ip)
+class Wall(object):
 
-    def allOff(self):
-        for stick in self.sticks:
-            stick.setAllLeds(0,0,0)
+	def __init__(self,startNumber, endNumber):
+		self.__sticks = [ Stick(IP_HOST_BASE+str(i),i) for i in range(startNumber, endNumber)]
 
-    def setAllSticks(self,r,g,b):
-        for stick in self.sticks:
-            stick.setAllLeds(r,g,b)
-            stick.updateLeds()
-            time.sleep(0.2)
+	def get(self, pos):
+		return self.__sticks[pos]
 
-class Lightstick():
-    header = array('B',[0,0,0,0])
-    dark = array('B',[0,0,0])
-    def __init__(self, ip, rt=0,gr=0,bl=0):
-        self.ip = ""
-        self.leds = []
-        default = array('B',[rt,gr,bl])
-        self.ip = ip
-        sys.stdout.write("initialise new lightstick\n")
-        self.leds.append(self.header)
-        for i in range(0,60):
-            #sys.stdout.write("adding led <" + str(i+1) + ">\n")
-            self.leds.append(copy.copy(default))
+	def update(self,force=False):
+		for s in self.__sticks:
+			s.update(force)
 
-    def setAllLeds(self, r, g, b):
-        print ("set all leds to: "+str(r)+", "+str(g)+", "+str(b))
-        for i in range(1,61):
-            self.leds[i] = [r,g,b]
-        self.updateLeds()
+	def len(self):
+		return len(self.__sticks)
 
-    def setLed(self, led, red, green, blue):
-        #print("Setting LED <"+str(led)+"> to: "+str(red)+ ", "+str(green)+", "+str(blue))
-        #old = copy.copy(self.leds[led])
-        self.leds[led][0] = red
-        self.leds[led][1] = green
-        self.leds[led][2] = blue
-        #return old
+	def shiftLeft(self):
+		fArray = array('B')
+		for i in range(0,len(self.__sticks)):
+			bArray = self.__sticks[i].getBytes()
+			if i > 0:
+				self.__sticks[i-1].setBytes(bArray)
+			else:
+				fArray = bArray
+		self.__sticks[len(self.__sticks)-1].setBytes(fArray)
 
-    def printLeds(self):
-        #self.leds.pop(0)#
-        print(self.ip)
-        for led in self.leds:
-            print(led)
+	def shiftRight(self):
+		fArray = array('B')
+		for i in range(0,len(self.__sticks)):
+			if i < len(self.__sticks) -2:
+				fArray = self.__sticks[i].getBytes()
+				self.__sticks[i].setBytes(fArray)
+			else:
+				fArray = self.__sticks[i].getBytes()
+				self.__sticks[0].setBytes(fArray)
 
-    def updateLeds(self):
-        message = array('B',[])
-        for x in self.leds:
-            message.extend(x)
-        sock.sendto(message,(self.ip, UDP_PORT))
-        #print("updating lightstick"+self.ip)
+	def setColor(self, red, green, blue):
+		for i in range(0, len(self.__sticks)):
+			self.__sticks[i].setColor(red,green,blue)
 
-def main(argv):
-    w = Wall(50,1)
+	def clear(self):
+		for stick in self.__sticks:
+			stick.clear()
 
-    list_of_colors = [(0xff, 0xff, 0xff), (0xff, 0xff, 0x33), (0xff, 0x80, 0x00),(0xff, 0x00, 0x00)]
+	def shiftUp(self):
+		for stick in self.__sticks:
+			stick.shiftUp()
 
-    def LerpColour(c1,c2,t):
-        return (int(c1[0]+(c2[0]-c1[0])*t),int(c1[1]+(c2[1]-c1[1])*t),int(c1[2]+(c2[2]-c1[2])*t))
+	def shiftDown(self):
+		for stick in self.__sticks:
+			stick.shiftDown()
 
-    while True:
-        for n in range(len(list_of_colors)-1):
-            for y in range((60/4)*n,(60/4)*(n+1)):
-                color = LerpColour(list_of_colors[n],list_of_colors[n+1],(1.0/60)*y)
-                print color
-                for x in range(0,len(w.sticks)):
-                    if(random.random() <= 0.3):
-                        w.sticks[x].setLed(y, 0, 0, 0)
-                    else:
-                        w.sticks[x].setLed(y, *color)
-                    w.sticks[x].updateLeds()
-
-    # while True:
-    #     rgb =  colorsys.hsv_to_rgb(random.random(), 1, 0.20)
-    #     color = [int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)]
-    #     up=True
-    #     for i in range(0,len(w.sticks)/2):
-    #         x1 = len(w.sticks)-1-i
-    #         x2 = i
-    #         print("Updating " + str(x1) + " and " + str(x2))
-    #         for y in range(59*(not up),60*up, -1+(2*up) ):
-    #             w.sticks[x1].setLed(y+1, *color)
-    #             w.sticks[x1].updateLeds()
-    #             w.sticks[x2].setLed(y+1, *color)
-    #             w.sticks[x2].updateLeds()
-    #             time.sleep(0.005)
-    #         up=not up
-    #     rgb =  colorsys.hsv_to_rgb(random.random(), 1, 0.20)
-    #     color = [int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)]
-    #     for i in range(0,len(w.sticks)/2):
-    #         z1 = (len(w.sticks)/2) - i - 1
-    #  z2 = (len(w.sticks)/2) + i
-    #         for x in range(59*(not up),60*up, -1+(2*up) ):
-    #             w.sticks[z1].setLed(x+1, *color)
-    #             w.sticks[z1].updateLeds()
-    #             w.sticks[z2].setLed(x+1, *color)
-    #             w.sticks[z2].updateLeds()
-    #             time.sleep(0.005)
-    #         up=not up
+	def drawArrow(self,startStick,red,green,blue):
+		if len(self.__sticks) < startStick+8:
+			print("Not enough sticks")
+		else:
+			self.get(startStick+0).get(30).setColor(red,green,blue)
+			for i in range(25,35):
+				self.get(startStick+1).get(i).setColor(red,green,blue)
+			for i in range(15,45):
+				self.get(startStick+2).get(i).setColor(red,green,blue)
+			for i in range(10,50):
+				self.get(startStick+3).get(i).setColor(red,green,blue)
+			for i in range(0,60):
+				self.get(startStick+4).get(i).setColor(red,green,blue)
+			for i in range(15,45):
+				self.get(startStick+5).get(i).setColor(red,green,blue)
+			for i in range(15,45):
+				self.get(startStick+6).get(i).setColor(red,green,blue)
+			for i in range(15,45):
+				self.get(startStick+7).get(i).setColor(red,green,blue)
+			# for i in range(15,45):
+			# 	self.get(startStick+8).get(i).setColor(red,green,blue)
 
 
-if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+sticks=50
+
+w1 = Wall(1, sticks)
+w1.clear()
+w1.setColor(0,10,0)
+w1.drawArrow(0,50,0,0)
+w1.drawArrow(12,0,50,50)
+
+# w2 = Wall(26,51)
+# w2.clear()
+# w2.setColor(0,10,0)
+# w2.drawArrow(0,50,0,0)
+# w2.drawArrow(12,0,50,50)
+
+
+w1.update()
+# w2.update()
+
+lochArray=array('i',(-1 for i in range(0,50)))
+
+while True:
+	time.sleep(0.08)
+	for a in range(0,sticks - 1):
+		s1 = w1.get(a)
+		for i in range(0,60):
+			if 50 - (i * 6) > 0:
+				s1.get(i).setColor(100,100 - (i * 6),50 - (i * 6))
+			elif 100 - (i * 6) > 0:
+				s1.get(i).setColor(100,100 - (i * 6),0)
+			else:
+				s1.get(i).setColor(100,0,0)
+
+	for a in range(0,sticks - 1):
+		s1 = w1.get(a)
+		if lochArray[a] != -1: 
+			s1.get(lochArray[a]).setColor(0,0,0)
+			lochArray[a] = lochArray[a]+ random.randint(0,3)
+			if lochArray[a] >= 60:
+				lochArray[a] = -1
+		else:
+			ra = random.randint(0,3)
+			if ra == 0:
+				lochArray[a] = random.randint(0,3)
+		for i in range(59, random.randint(47,59),-1):
+			s1.get(i).setColor(0,0,0)
+	w1.update()
+
+# while True:
+# 	time.sleep(0.2)
+# 	w1.shiftRight()
+# 	w1.update()
+# 	w2.shiftLeft()
+# 	w2.update()
+
+# while True:
+# 	w1.shiftLeft()
+# 	w1.update()
+# 	time.sleep(10/FPS)
+	# for sNum in range(0,w1.len()):
+	# 	s = w1.get(sNum)
+	# 	s.setColor(200,0,0)
+	# 	if sNum > 0:
+	# 		s1 = w1.get(sNum -1)
+	# 		s1.setColor(0,50,0)
+	# 	else:
+	# 		s1 = w1.get(w1.len()-1)
+	# 		s1.setColor(0,50,0)
+	# 	w1.update()
+	# 	time.sleep(1/FPS)
+
+# s1 = Stick('192.168.23.25',50)
+# s1.updateStick()
+
+# while True:
+# 	for i in range(0,60):
+# 		s1.get(i).setColor(255,255,255)
+# 		if i < 59:
+# 			s1.get(i+1).setColor(255,0,0)
+# 		s1.updateStick()
+# 		s1.get(i).setColor(0,50,0)
+# 		time.sleep(0.1)
+
