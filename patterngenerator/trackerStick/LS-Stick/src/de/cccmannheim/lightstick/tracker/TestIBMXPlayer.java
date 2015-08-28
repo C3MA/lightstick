@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -49,18 +47,7 @@ public class TestIBMXPlayer {
 	public static void main(final String[] args) throws SocketException, UnknownHostException {
 		TestIBMXPlayer.datagramSocket = new DatagramSocket();
 
-		while (true) {
-			TestIBMXPlayer.scan();
-			if (TestIBMXPlayer.addressesmap.size() < 30) {
-				try {
-					Thread.sleep(1000);
-				} catch (final InterruptedException e) {
-					e.printStackTrace();
-				}
-			} else {
-				break;
-			}
-		}
+		TestIBMXPlayer.scan();
 		TestIBMXPlayer.packet = new int[TestIBMXPlayer.STICK_COUNT][61 * 3 + 4];
 
 		final File[] files = TestIBMXPlayer.folder.listFiles();
@@ -97,38 +84,14 @@ public class TestIBMXPlayer {
 
 	}
 
-	private static void scan() {
+	private static void scan() throws UnknownHostException {
 		TestIBMXPlayer.STICK_COUNT = 0;
 		TestIBMXPlayer.addressesmap.clear();
-		int skip = 0;
-		for (int i = 1; i < 250; i++) {
-			if (i % 10 == 0) {
-				System.out.println("Scanning for sticks " + (i) + "%");
-			}
-			try {
-				final InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
-				final Socket tester = new Socket();
-				final InetSocketAddress inetadd = new InetSocketAddress(address, 2323);
-				tester.connect(inetadd, 1500);
-				final boolean connected = tester.getInputStream().read() > 0;
-				System.out.println(connected + " " + inetadd);
-				if (connected) {
-					TestIBMXPlayer.addressesmap.put(TestIBMXPlayer.STICK_COUNT, address);
-					TestIBMXPlayer.STICK_COUNT++;
-				} else {
-					skip++;
-					if (skip > 3) {
-						System.out.println("Finished scanning");
-						break;
-					}
-				}
-			} catch (final Exception e) {
-				skip++;
-				if (skip > 3) {
-					System.out.println("Finished scanning");
-					break;
-				}
-			}
+		final int skip = 0;
+		for (int i = 1; i < 51; i++) {
+			final InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
+			TestIBMXPlayer.addressesmap.put(TestIBMXPlayer.STICK_COUNT, address);
+			TestIBMXPlayer.STICK_COUNT++;
 		}
 		System.out.println("Detected " + (TestIBMXPlayer.STICK_COUNT + 1) + " sticks");
 	}
@@ -219,13 +182,12 @@ public class TestIBMXPlayer {
 
 	protected synchronized static void playRandom() {
 		final ArrayList<Object> colors = new ArrayList<>();
-		for (int r = 0; r < 255; r = r + 255 / 3) {
-			for (int g = 0; g < 255; g = g + 255 / 3) {
-				for (int b = 0; b < 255; b = b + 255 / 3) {
-					colors.add(new Color(r, g, b));
-				}
-			}
-		}
+		colors.add(Color.BLUE);
+		colors.add(Color.red);
+		colors.add(Color.YELLOW);
+		colors.add(Color.ORANGE);
+		colors.add(Color.MAGENTA);
+		colors.add(Color.green);
 		final Random rnd = new Random(System.currentTimeMillis());
 		Collections.shuffle(colors, rnd);
 
