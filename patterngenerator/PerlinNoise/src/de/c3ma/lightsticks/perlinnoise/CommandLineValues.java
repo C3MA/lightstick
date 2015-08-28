@@ -38,14 +38,6 @@ public final class CommandLineValues {
         return gui;
     }
     
-    @Option(name =  "-t", aliases = {"--time"}, required = false,
-            usage = "time to run in miliseconds. 0 or default is inity")
-    private long time = 0;
-
-    public long getTime() {
-        return time;
-    }
-    
     @Option(name = "-d", aliases = {"--dimm"}, required = false,
             usage = "dimm value 0.00 - 1.00. Default is 1.00")
     private double dimm = 1.00;

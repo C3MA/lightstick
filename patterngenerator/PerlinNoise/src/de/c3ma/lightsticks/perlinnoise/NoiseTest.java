@@ -49,6 +49,8 @@ public class NoiseTest extends JFrame implements Runnable {
     private long timeToRun ;
 	private Dynamic dynamic;
 
+	private boolean mHasGUI = false;
+
     /**
      * @param args the command line arguments
      */
@@ -62,10 +64,12 @@ public class NoiseTest extends JFrame implements Runnable {
             System.exit(1);
         }
 
-        JFrame frame = new NoiseTest(values);
+        NoiseTest frame = new NoiseTest(values);
+        frame.mHasGUI = values.hasGui();
         frame.setSize(600, 800);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        if (values.hasGui()) {
+        
+        if (frame.mHasGUI) {
             frame.setVisible(true);
         }
 
@@ -74,7 +78,6 @@ public class NoiseTest extends JFrame implements Runnable {
     public NoiseTest(CommandLineValues values) throws UnknownHostException, IOException {
         width = values.getWidth();
         height = values.getHeight();
-        timeToRun = values.getTime();
         dimm = (float) values.getDimm();
         offsetX = values.getOffsetX();
         offsetY = values.getOffsetY();
@@ -91,6 +94,7 @@ public class NoiseTest extends JFrame implements Runnable {
 
         if (values.getRemoteAddress() != null) {
             dynamic = new Dynamic(values.getRemoteAddress(), width, height);
+            System.out.println("Generate content with " + width + "x" + height + " pixels, or for " + width + " lightsticks.");
         }
 
         new Thread(this).start();
@@ -99,10 +103,14 @@ public class NoiseTest extends JFrame implements Runnable {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g.drawImage(image,
+        /* only draw something, if necessary */
+        if (this.mHasGUI)
+        {
+        	g.drawImage(image,
                 10, 30, 480, 770,
                 0, 0, width, height,
                 this);
+        }
     }
 
     @Override
@@ -112,9 +120,9 @@ public class NoiseTest extends JFrame implements Runnable {
         
         while (true) {
             System.gc();
-            //texture.renderAndWait(texturePattern);
-            texture.run(texturePattern);
-
+            texture.renderAndWait(texturePattern);
+            //texture.run(texturePattern);
+            System.out.println(".");
             image = texture.getImage();
 
 
@@ -132,10 +140,14 @@ public class NoiseTest extends JFrame implements Runnable {
             	for(int y = 0; y < height; y++) {
                     for(int x = 0; x < width; x++) { 
                         Color c = new Color(image.getRGB(x, y));
-                        dynamic.updatePixel(c.getRed(), c.getGreen(), c.getBlue(), x, y);
+                        dynamic.updatePixel((byte) c.getRed(), (byte) c.getGreen(), (byte) c.getBlue(), x, y);
                     }
                 }
-            	dynamic.sendImage();
+            	try {
+					dynamic.sendImage();
+				} catch (IOException e) {
+					Logger.getLogger(NoiseTest.class.getName()).log(Level.SEVERE, "Communication Error", e.getMessage());
+				}
             }
             
             try {

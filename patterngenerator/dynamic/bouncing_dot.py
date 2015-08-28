@@ -12,7 +12,7 @@ blue=array('B',[0,0,255])
 space = array('B',[0,0,0])
 
 
-TIME=0.03
+TIME=0.1
 UPDATE_FACTOR=3
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -42,6 +42,14 @@ def generateDot(position):
                         message.extend(red)
                         message.extend(green)
                         message.extend(blue)
+                        message.extend(space)
+                        message.extend(space)
+                        message.extend(space)
+                        message.extend(space)
+                        message.extend(space)
+                        message.extend(space)
+                        message.extend(space)
+                        message.extend(space)
                         message.extend(space)
                         message.extend(space)
                         message.extend(space)
