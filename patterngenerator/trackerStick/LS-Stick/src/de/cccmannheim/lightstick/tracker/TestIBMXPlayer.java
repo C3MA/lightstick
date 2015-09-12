@@ -88,7 +88,7 @@ public class TestIBMXPlayer {
 		TestIBMXPlayer.STICK_COUNT = 0;
 		TestIBMXPlayer.addressesmap.clear();
 		final int skip = 0;
-		for (int i = 1; i < 51; i++) {
+		for (int i = 1; i < 16; i++) {
 			final InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
 			TestIBMXPlayer.addressesmap.put(TestIBMXPlayer.STICK_COUNT, address);
 			TestIBMXPlayer.STICK_COUNT++;
@@ -171,8 +171,8 @@ public class TestIBMXPlayer {
 				e.printStackTrace();
 			}
 			for (int i = 4; i < TestIBMXPlayer.packet[stickid].length; i++) {
-				if (TestIBMXPlayer.packet[stickid][i] > 30) {
-					TestIBMXPlayer.packet[stickid][i] -= 30;
+				if (TestIBMXPlayer.packet[stickid][i] > 50) {
+					TestIBMXPlayer.packet[stickid][i] -= 50;
 				} else {
 					TestIBMXPlayer.packet[stickid][i] = 0;
 				}
@@ -231,10 +231,17 @@ public class TestIBMXPlayer {
 	}
 
 	static private void copy(final int stickid, final byte[] data) {
-		for (int i = 4; i < data.length; i++) {
-			final int value = (TestIBMXPlayer.packet[stickid][i] * 2);
-			data[i] = (byte) (value);
+		if (stickid % 2 == 0) {
+			for (int i = 4; i < data.length; i++) {
+				final int value = (TestIBMXPlayer.packet[stickid][i] * 2);
+				data[i] = (byte) (value);
+			}
+		} else {
+			for (int i = data.length - 1; i >= 4; i--) {
+				final int value = (TestIBMXPlayer.packet[stickid][i] * 2);
+				data[i] = (byte) (value);
+			}
 		}
-	}
 
+	}
 }
