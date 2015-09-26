@@ -29,7 +29,7 @@ public class TestIBMXPlayer {
 	private static String												ipStart			= "192.168.23.";
 
 	static File															folder			= new File("./music");
-	private static boolean												TEST_NODE		= false;
+	private static boolean												TEST_NODE		= true;
 	static int[][]														packet;
 	static private float												playtime		= 0;
 	static protected ConcurrentHashMap<Float, Map<NoteInfo, NoteInfo>>	todispatch		= new ConcurrentHashMap<>();
@@ -88,8 +88,11 @@ public class TestIBMXPlayer {
 		TestIBMXPlayer.STICK_COUNT = 0;
 		TestIBMXPlayer.addressesmap.clear();
 		final int skip = 0;
-		for (int i = 1; i < 16; i++) {
-			final InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
+		for (int i = 1; i < 25; i++) {
+			InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
+			if (TestIBMXPlayer.TEST_NODE) {
+				address = InetAddress.getByName("127.0.0.1");
+			}
 			TestIBMXPlayer.addressesmap.put(TestIBMXPlayer.STICK_COUNT, address);
 			TestIBMXPlayer.STICK_COUNT++;
 		}
@@ -198,7 +201,7 @@ public class TestIBMXPlayer {
 			TestIBMXPlayer.fileId = 0;
 		}
 		final File file = TestIBMXPlayer.fileList.get(TestIBMXPlayer.fileId);
-		if (file.getName().endsWith(".xm") || file.getName().endsWith(".mod") || file.getName().endsWith(".s3m")) {
+		if (file.getName().toLowerCase().endsWith(".xm") || file.getName().toLowerCase().endsWith(".mod") || file.getName().toLowerCase().endsWith(".s3m")) {
 			TestIBMXPlayer.play(file);
 		}
 	}

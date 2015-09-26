@@ -1,0 +1,27 @@
+import java.text.SimpleDateFormat;
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: "sonar-runner"
+
+
+sourceCompatibility=JavaVersion.VERSION_1_8
+compileJava.options.encoding = 'UTF-8'
+
+
+repositories {
+	mavenCentral()
+	maven { url "http://updates.jmonkeyengine.org/maven/"}
+}
+
+sourceSets.main.resources.srcDir 'src/main/java'
+
+dependencies {
+	compile "junit:junit:4.11"
+}
+
+buildscript {
+	repositories { jcenter() }
+}

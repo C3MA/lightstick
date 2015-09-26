@@ -1,5 +1,6 @@
 package de.c3ma.emuStick;
 
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -25,6 +26,7 @@ public class EmuStick {
 		frame.setSize(1024, 600);
 		frame.setVisible(true);
 
+		frame.getContentPane().setBackground(Color.black);
 		frame.getContentPane().setLayout(new FlowLayout());
 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -104,7 +106,7 @@ public class EmuStick {
 				}
 				return;
 			}
-			stick.setLed(led, r, g, b);
+			stick.setLed(60 - led, r, g, b);
 
 			led++;
 			restLenght = restLenght - 3;
