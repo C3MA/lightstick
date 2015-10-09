@@ -29,7 +29,7 @@ public class TestIBMXPlayer {
 	private static String												ipStart			= "192.168.23.";
 
 	static File															folder			= new File("./music");
-	private static boolean												TEST_NODE		= true;
+	private static boolean												TEST_NODE		= false;
 	static int[][]														packet;
 	static private float												playtime		= 0;
 	static protected ConcurrentHashMap<Float, Map<NoteInfo, NoteInfo>>	todispatch		= new ConcurrentHashMap<>();
@@ -88,7 +88,7 @@ public class TestIBMXPlayer {
 		TestIBMXPlayer.STICK_COUNT = 0;
 		TestIBMXPlayer.addressesmap.clear();
 		final int skip = 0;
-		for (int i = 1; i < 25; i++) {
+		for (int i = 1; i < 17; i++) {
 			InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
 			if (TestIBMXPlayer.TEST_NODE) {
 				address = InetAddress.getByName("127.0.0.1");
