@@ -4,7 +4,8 @@ import time
 from array import array
 import socket
 import sys
-import argparse
+import subprocess
+import threading
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 UDP_PORT = 2342
@@ -45,8 +46,8 @@ class Stick(object):
         try: 
             sock.sendto(message, (self.__ip, UDP_PORT))
             self.__changed = False
-        except socket.error: 
-            print("exception")
+        except socket.error as socket_error:
+            print("exception: ", socket_error, self.__ip)
 
     def get(self, pos):
         self.__changed = True
@@ -75,13 +76,27 @@ class Stick(object):
 
 
 class Wall(object):
+    def __init__(self,start_number, stick_count, stick_led_count, simulatorIP=""):
+        self.__foreground_color = [0,0,0]
+        self.__background_color = [0,0,0]
 
-    def __init__(self,startNumber, endNumber, simulatorIP=""):
+        try:
+            self.__stick_count = int(stick_count)
+        except ValueError:
+            raise ValueError("stick_count has to be a number!")
+
+        try:
+            self.__stick_led_count = int(stick_led_count)
+        except ValueError:
+            raise ValueError("stick_led_count has to be a number!")
+
+        end_number = start_number + self.__stick_count + 1
+
         if (simulatorIP == "" or simulatorIP == None):
-            self.__sticks = [ Stick(IP_HOST_BASE+str(i),i) for i in range(startNumber, endNumber)]
+            self.__sticks = [ Stick(IP_HOST_BASE+str(i),i) for i in range(start_number, end_number)]
         else:
             print simulatorIP
-            self.__sticks = [ Stick(simulatorIP,i) for i in range(startNumber, endNumber)]
+            self.__sticks = [ Stick(simulatorIP,i) for i in range(start_number, end_number)]
 
     def get(self, pos):
         return self.__sticks[pos]
@@ -117,7 +132,12 @@ class Wall(object):
 
     def clear(self):
         for stick in self.__sticks:
-            stick.clear()
+            if self.__background_color:
+                stick.setColor(self.background_color[0],
+                               self.background_color[1],
+                               self.background_color[2])
+            else:
+                stick.clear()
 
     def drawArrow(self,startStick,red,green,blue):
         if len(self.__sticks) < startStick+9:
@@ -132,83 +152,185 @@ class Wall(object):
                 self.get(startStick+3).get(i).setColor(red,green,blue)
             for i in range(0,60):
                 self.get(startStick+4).get(i).setColor(red,green,blue)
-            #for i in range(15,45):
-            #   self.get(startStick+5).get(i).setColor(red,green,blue)
-            #for i in range(15,45):
-            #   self.get(startStick+6).get(i).setColor(red,green,blue)
-            #for i in range(15,45):
-            #   self.get(startStick+7).get(i).setColor(red,green,blue)
-            # for i in range(15,45):
-            #   self.get(startStick+8).get(i).setColor(red,green,blue)
 
+    @property
+    def foreground_color(self):
+        return self.__foreground_color
 
-
-#----------- Main
-# Argument parsing..
-class CmdInput:
-    pass
-
-parser = argparse.ArgumentParser(description='Text to Sticks')
-parser.add_argument('--simulator', help='IP address of an the simulator; e.g. --simulator 127.0.0.1')
-
-args = parser.parse_args(namespace=CmdInput)
-# run
-heightfactor = 1
-stickCount = 24
-
-w1 = Wall(17,17 + stickCount + 1, CmdInput.simulator)
-w1.clear()
-w1.setColor(0,20,0)
-if (CmdInput.simulator):
-    w1.setColor(0,255,0)
-w1.update()
-
-textColor = [0, 0, 60]
-
-# prepare text convertion buffer
-textBuffer = list()
-
-for y, line in enumerate(sys.stdin):
-    line = line.replace("\r", "") 
-    line = line.replace("\n", "") 
-    print(line)
-    textBuffer.append([0] * len(line) )
-    for i, c in enumerate(line):
-        if c != " ":
-                textBuffer[y][i] = 1
+    @foreground_color.setter
+    def foreground_color(self, value):
+        if len(value) == 3:
+            self.__foreground_color = value
         else:
-                textBuffer[y][i] = 0
+            raise ValueError("Need a list with 3 elements for RGB colors")
+
+    @property
+    def background_color(self):
+        return self.__background_color
+
+    @background_color.setter
+    def background_color(self, value):
+        if len(value) == 3:
+            self.__background_color = value
+        else:
+            raise ValueError("Need a list with 3 elements for RGB colors")
+
+    @property
+    def stick_count(self):
+        return self.__stick_count
+
+    @property
+    def stick_led_count(self):
+        return self.__stick_led_count
 
 
-# Shrink it baby!
-outputBuffer = list()
-firstColumn = []
-# Move the first column into the output
-outputBuffer.append([ textBuffer[i][0] for i in range(0, len(textBuffer))])
+class MarqueeText(object):
+    class MarqueeAnimationThread(threading.Thread):
+        def __init__(self, marquee_text_object, outputBuffer):
+            super(MarqueeText.MarqueeAnimationThread, self).__init__()
+            self._stop = threading.Event()
 
-print outputBuffer
+            self.__marquee_text = marquee_text_object
+            self.__outputBuffer = outputBuffer
 
-# start with the second column
-for spalte in range(1, len(textBuffer[0])):
- #   print "------ Spalte " + str(spalte) + " --------"
-    for zeile in range(0, len(textBuffer)):
-        if textBuffer[zeile][spalte -1] !=  textBuffer[zeile][spalte]:
-            # Move the column to the output buffer
-            outputBuffer.append([ textBuffer[i][spalte] for i in range(0, len(textBuffer))])
-            break
- #       else:
- #           if zeile == (len(textBuffer) - 1):
- #               print "Same column found at " + str(spalte) 
+        def run(self):
+            direction = 0   #0 = right; 1 = left
+            offset = 0
+            max_offset = len(self.__outputBuffer) - self.__marquee_text.wall_object.stick_count - 1
 
-#for line in textBuffer:
-#    print line
+            while not self.stopped():
+                self.__marquee_text.draw_text(self.__outputBuffer, offset)
+                self.__marquee_text.wall_object.update()
 
-for columnNo, column in enumerate(outputBuffer):
-    for rowNo, row in enumerate(outputBuffer[columnNo]):
-        s = w1.get((stickCount - 1) - columnNo)
-        for x in range(0, heightfactor):
-            offset = 59 - ((rowNo * heightfactor) + x)
-            if row == 1:
-                s.get(offset).setColor(*textColor)
-w1.update()
-exit()
+                if direction == 0:
+                    if offset < max_offset:
+                        offset += 1
+                    else:
+                        direction = 1
+                else:
+                    if offset > 0:
+                        offset -= 1
+                    else:
+                        direction = 0
+
+                time.sleep(self.__marquee_text.tick_delay)
+                self.__marquee_text.wall_object.clear()
+
+        def stop(self):
+            self._stop.set()
+
+        def stopped(self):
+            return self._stop.isSet()
+
+    def __init__(self, wall_object, tick_delay=0.5, height_factor=1, text_color=None):
+        self.wall_object = wall_object
+        self._stick_count = self.wall_object.stick_count
+        self._stick_height = self.wall_object.stick_led_count
+        self._height_factor = height_factor
+        self._text_color = text_color
+        self.__tick_delay = tick_delay
+        self._text = ""
+        self.__marquee_thread = None
+
+        if text_color:
+            self._text_color = text_color
+        else:
+            self._text_color = wall_object.foreground_color
+
+    def __start_new_marquee(self):
+        outputBuffer = self.__generate_output_buffer(self.text)
+
+        #Clean sticks
+        self.wall_object.clear()
+
+        #Is the text too big to show it as a single image?
+        if self.wall_object.stick_count < len(outputBuffer):
+            # Then we need a marquee
+
+            # Stop potential existing thread
+            if self.__marquee_thread:
+                if not self.__marquee_thread.stopped():
+                    self.__marquee_thread.stop()
+
+            self.__marquee_thread = self.MarqueeAnimationThread(self, outputBuffer)
+            self.__marquee_thread.setDaemon(True)
+            self.__marquee_thread.start()
+        else:
+            # Draw single Frame
+            self.draw_text(outputBuffer)
+
+
+    def __generate_output_buffer(self, text=" "):
+        # prepare text convertion buffer
+        textBuffer = list()
+
+        #Call figlet and make it give us a nice ascii art
+        figletOutput = subprocess.check_output(["figlet", "-f", "banner", text])
+
+        for y, line in enumerate(figletOutput.split("\n")):
+            line = line.replace("\r", "")
+            line = line.replace("\n", "")
+            print(line)
+            textBuffer.append([0] * len(line) )
+            for i, c in enumerate(line):
+                if c != " ":
+                        textBuffer[y][i] = 1
+                else:
+                        textBuffer[y][i] = 0
+
+        # Shrink it baby!
+        outputBuffer = list()
+
+        # For getting the dimension information, we'll use the first column and first row
+        columns = len(textBuffer[0])
+        rows = len(textBuffer) - 1 # We need to subtract 1, because the last line generates an empty list
+
+        #Fill the outputBuffer with 0's
+        outputBuffer=[[0 for row in range(0, rows)] for column in range(0, columns)]
+
+        for column in range(0, columns):
+            for row in range(0, rows):
+                outputBuffer[column][row] = textBuffer[row][column]
+
+        return outputBuffer
+
+
+    def draw_text(self, outputBuffer, x_offset=0):
+        for columnNo, column in enumerate(outputBuffer):
+            for rowNo, row in enumerate(outputBuffer[columnNo]):
+
+                s = self.wall_object.get(max(min(columnNo-x_offset, self._stick_count), 0))
+                for x in range(0, self._height_factor):
+                    offset = 18 - ((rowNo * self._height_factor) + x)
+                    if row == 1:
+                        s.get(offset).setColor(*self._text_color)
+
+        self.wall_object.update()
+
+    @property
+    def tick_delay(self):
+        return self.__tick_delay
+
+    @tick_delay.setter
+    def tick_delay(self, value):
+        self.__tick_delay = value
+
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        self._text = value
+        self.__start_new_marquee()
+
+    @property
+    def text_color(self):
+        return self._text_color
+
+    @text_color.setter
+    def text_color(self, value):
+        if len(value)==3:
+            self._text_color = value
+        else:
+            raise ValueError("Need a list with 3 elements for RGB colors")
