@@ -153,10 +153,10 @@ parser.add_argument('--simulator', help='IP address of an the simulator; e.g. --
 
 args = parser.parse_args(namespace=CmdInput)
 # run
-heightfactor = 5
-stickCount = 50
+heightfactor = 1
+stickCount = 24
 
-w1 = Wall(1,stickCount + 1, CmdInput.simulator)
+w1 = Wall(17,17 + stickCount + 1, CmdInput.simulator)
 w1.clear()
 w1.setColor(0,20,0)
 if (CmdInput.simulator):
@@ -204,7 +204,7 @@ for spalte in range(1, len(textBuffer[0])):
 #    print line
 
 for columnNo, column in enumerate(outputBuffer):
-    for rowNo, row in enumerate(outputBuffer[columnNo]): 
+    for rowNo, row in enumerate(outputBuffer[columnNo]):
         s = w1.get((stickCount - 1) - columnNo)
         for x in range(0, heightfactor):
             offset = 59 - ((rowNo * heightfactor) + x)
