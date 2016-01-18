@@ -44,6 +44,8 @@ public class TestIBMXPlayer {
 	static Map<Integer, InetAddress>									addressesmap	= new HashMap<Integer, InetAddress>();
 	private static int													tracks			= 1;
 
+	private static File													currentFile;
+
 	public static void main(final String[] args) throws SocketException, UnknownHostException {
 		TestIBMXPlayer.datagramSocket = new DatagramSocket();
 
@@ -66,12 +68,11 @@ public class TestIBMXPlayer {
 				while (true) {
 					if (cin.hasNextLine()) {
 						final String line = cin.nextLine();
-						if (line.isEmpty()) {
-							TestIBMXPlayer.playRandom();
-						}
+						TestIBMXPlayer.processInput(line);
 					}
 				}
-			};
+			}
+
 		}.start();
 
 		final Timer timer = new Timer();
@@ -84,11 +85,31 @@ public class TestIBMXPlayer {
 
 	}
 
+	private static void processInput(final String line) {
+		if (line.contains("rm")) {
+			try {
+				System.out.println("Deleting current file " + TestIBMXPlayer.currentFile);
+				TestIBMXPlayer.currentFile.delete();
+				Thread.sleep(2000);
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			TestIBMXPlayer.processInput("");
+		}
+		if (line.isEmpty()) {
+			try {
+				TestIBMXPlayer.playRandom();
+			} catch (final Exception e) {
+
+			}
+		}
+	};
+
 	private static void scan() throws UnknownHostException {
 		TestIBMXPlayer.STICK_COUNT = 0;
 		TestIBMXPlayer.addressesmap.clear();
 		final int skip = 0;
-		for (int i = 1; i < 17; i++) {
+		for (int i = 17; i < 41; i++) {
 			InetAddress address = InetAddress.getByName(TestIBMXPlayer.ipStart + i);
 			if (TestIBMXPlayer.TEST_NODE) {
 				address = InetAddress.getByName("127.0.0.1");
@@ -102,7 +123,11 @@ public class TestIBMXPlayer {
 	protected static void update() {
 		TestIBMXPlayer.playtime += 1 / 15f;
 		if (TestIBMXPlayer.anode == null || TestIBMXPlayer.anode.isFinsihed()) {
-			TestIBMXPlayer.playRandom();
+			try {
+				TestIBMXPlayer.playRandom();
+			} catch (final Exception e) {
+				TestIBMXPlayer.processInput("rm");
+			}
 		}
 
 		final List<Float> removeKeys = new ArrayList<>();
@@ -174,8 +199,8 @@ public class TestIBMXPlayer {
 				e.printStackTrace();
 			}
 			for (int i = 4; i < TestIBMXPlayer.packet[stickid].length; i++) {
-				if (TestIBMXPlayer.packet[stickid][i] > 50) {
-					TestIBMXPlayer.packet[stickid][i] -= 50;
+				if (TestIBMXPlayer.packet[stickid][i] > 30) {
+					TestIBMXPlayer.packet[stickid][i] -= 30;
 				} else {
 					TestIBMXPlayer.packet[stickid][i] = 0;
 				}
@@ -184,6 +209,10 @@ public class TestIBMXPlayer {
 	}
 
 	protected synchronized static void playRandom() {
+		for (int i = 0; i < 100; i++) {
+			System.out.println();
+		}
+
 		final ArrayList<Object> colors = new ArrayList<>();
 		colors.add(Color.BLUE);
 		colors.add(Color.red);
@@ -207,6 +236,7 @@ public class TestIBMXPlayer {
 	}
 
 	static synchronized private void play(final File fname) {
+		TestIBMXPlayer.currentFile = fname;
 		System.out.println(fname + " trackerLight");
 		if (TestIBMXPlayer.anode != null) {
 			TestIBMXPlayer.anode.terminate();
@@ -234,17 +264,17 @@ public class TestIBMXPlayer {
 	}
 
 	static private void copy(final int stickid, final byte[] data) {
-		if (stickid % 2 == 0) {
-			for (int i = 4; i < data.length; i++) {
-				final int value = (TestIBMXPlayer.packet[stickid][i] * 2);
-				data[i] = (byte) (value);
-			}
-		} else {
-			for (int i = data.length - 1; i >= 4; i--) {
-				final int value = (TestIBMXPlayer.packet[stickid][i] * 2);
-				data[i] = (byte) (value);
-			}
+		// if (stickid % 2 == 0) {
+		for (int i = 4; i < data.length; i++) {
+			final int value = (TestIBMXPlayer.packet[stickid][i] * 2);
+			data[i] = (byte) (value);
 		}
+		// } else {
+		// for (int i = data.length - 1; i >= 4; i--) {
+		// final int value = (TestIBMXPlayer.packet[stickid][i] * 2);
+		// data[i] = (byte) (value);
+		// }
+		// }
 
 	}
 }
