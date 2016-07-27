@@ -25,7 +25,7 @@ function startTelnetServer(dummy)
 	node.output(s_output, 0)
 	c:on("receive",function(c,l)
 	  node.input(l)
-	end)
+	end) 
 	c:on("disconnection",function(c)
 	  node.output(nil)
 	  global_c=nil
